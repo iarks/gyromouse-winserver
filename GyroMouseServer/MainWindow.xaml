@@ -7,6 +7,8 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
     <Grid>
-        
+        <Button Content="Start Server" HorizontalAlignment="Left" Margin="10,104,0,0" VerticalAlignment="Top" Width="75" Click="Button_Click"/>
+        <Label x:Name="label_ipAddress" Content="Label" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.813,-2.555" Width="497"/>
+        <Label x:Name="label_messages" Content="Label" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,36,0,0" Width="497"/>
     </Grid>
 </Window>
