@@ -11,6 +11,6 @@
         <Label x:Name="label_ipAddress" Content="" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.813,-2.555" Width="497"/>
         <Label x:Name="label_messages" Content="Server Stopped" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,285,0,0" Width="497"/>
         <Button x:Name="button_stopServer" Content="Stop Server" Margin="0,171,211,0" VerticalAlignment="Top" Click="Button_Click_2" IsEnabled="False" HorizontalAlignment="Right" Width="77"/>
-        <Button Content="Button" HorizontalAlignment="Left" Margin="318,265,0,0" VerticalAlignment="Top" Width="75" Click="Button_Click_1"/>
+        <Button Content="Button" HorizontalAlignment="Left" Margin="318,265,0,0" VerticalAlignment="Top" Width="75"/>
     </Grid>
 </Window>
