@@ -22,6 +22,7 @@ namespace GyroMouseServer
         bool serverSwitch = false;
         ThreadStart clientConnectThreadStart;
         Thread clientConnectThread;
+        MouseMove mm = new MouseMove();
 
         public MainWindow()
         {
@@ -45,6 +46,8 @@ namespace GyroMouseServer
             clientConnectThread.Start();
             button_startServer.IsEnabled = false;
             button_stopServer.IsEnabled = true;
+        
+            
         }
 
         public static string getLocalHost()
