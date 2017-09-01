@@ -10,6 +10,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Collections.Concurrent;
 using Newtonsoft.Json.Linq;
+using GyroMouseServer_MouseMove;
 
 namespace GyroMouseServer_ClientRequestHandler
 {
@@ -21,7 +22,9 @@ namespace GyroMouseServer_ClientRequestHandler
         private UdpClient newSocket;
         private SynchronizationContext uiThread;
         private String receivedCommand;
-        private Label label_messages,label_ipAddress; 
+        private Label label_messages,label_ipAddress;
+
+        private MouseMove mouseMove = new MouseMove();
 
         private BlockingCollection<string> blockingCollections;
 
@@ -48,23 +51,38 @@ namespace GyroMouseServer_ClientRequestHandler
 
                 // received data
                 receivedCommand = Encoding.ASCII.GetString(receivedByte, 0, receivedByte.Length);
-                
-                // converting it to json
-                JObject json = JObject.Parse(receivedCommand);
 
-                //extracting that data
-                JToken X;
-                json.TryGetValue("X", out X);
-
-                // converting the data back to string
-                X.ToString();
-
-                // printing received data to label
-                uiThread.Send((object state) =>
+                try
                 {
-                    label_messages.Content = receivedCommand;
-                    label_ipAddress.Content = X.ToString(); ;
-                }, null);
+                    // converting it to json
+                    JObject json = JObject.Parse(receivedCommand);
+
+                    //extracting that data
+                    JToken X;
+                    JToken Y;
+
+                    json.TryGetValue("X", out X);
+                    json.TryGetValue("Y", out Y);
+
+                    // converting the data back to string
+                    mouseMove.movePointer(float.Parse(X.ToString()), float.Parse(Y.ToString()));
+
+                    // printing received data to label
+                    uiThread.Send((object state) =>
+                    {
+                        label_messages.Content = receivedCommand;
+                        label_ipAddress.Content = Y.ToString() + ":" + X.ToString() ;
+                    }, null);
+                }
+                catch (Exception e)
+                {
+                    uiThread.Send((object state) =>
+                    {
+                        label_messages.Content = receivedCommand;
+                        label_ipAddress.Content = "UNKNOWN";
+                    }, null);
+                    //throw;
+                }
 
                 //sending a message back to client
                 //string connectionInitiateMessage = "Connected To " + System.Environment.MachineName;
