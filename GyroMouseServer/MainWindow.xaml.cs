@@ -3,6 +3,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Windows;
+using System.Windows.Forms; 
 
 namespace GyroMouseServer
 {
@@ -17,6 +18,10 @@ namespace GyroMouseServer
         UdpClient newsock;
         IPEndPoint remoteIPEndpoint;
         private SynchronizationContext MainThread;
+        KeyboardInput kbi = new KeyboardInput();
+        bool serverSwitch = false;
+        ThreadStart clientConnectThreadStart;
+        Thread clientConnectThread;
 
         public MainWindow()
         {
@@ -26,19 +31,20 @@ namespace GyroMouseServer
         private void Button_Click(object remoteIPEndpoint, RoutedEventArgs e)
         {
             MainThread = SynchronizationContext.Current;
-            //if (MainThread == null)
-            //    MainThread = new SynchronizationContext();
+
             ipep = new IPEndPoint(IPAddress.Any, 9050);
             newsock = new UdpClient(ipep);
-            
-            label_ipAddress.Content = "Server started at IP : "+ getLocalHost()+" Listeneing on port : "+ "9050";
+
+            label_ipAddress.Content = "Server started at IP : " + getLocalHost() + " Listeneing on port : " + "9050";
             label_messages.Content = "Waiting for a client...";
 
             remoteIPEndpoint = new IPEndPoint(IPAddress.Any, 0);
 
-            ThreadStart clientConnectThreadStart = new ThreadStart(clientConnect);
-            Thread clientConnectThread = new Thread(clientConnectThreadStart);
+            clientConnectThreadStart = new ThreadStart(clientConnect);
+            clientConnectThread = new Thread(clientConnectThreadStart);
             clientConnectThread.Start();
+            button_startServer.IsEnabled = false;
+            button_stopServer.IsEnabled = true;
         }
 
         public static string getLocalHost()
@@ -66,9 +72,23 @@ namespace GyroMouseServer
             }, null);
 
             // sending a message
-            string welcome = "Welcome to my test server";
-            data = Encoding.ASCII.GetBytes(welcome);
+            string connectionInitiateMessage = "Connected To " + System.Environment.MachineName;
+            data = Encoding.ASCII.GetBytes(connectionInitiateMessage);
             newsock.Send(data, data.Length, this.remoteIPEndpoint);
+        }
+        
+        private void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+            clientConnectThread.Abort();
+            newsock.Close();
+            string message = "Server Stopped";
+            MainThread.Send((object state) =>
+            {
+                label_messages.Content = message;
+                label_ipAddress.Content = "";
+            }, null);
+            button_startServer.IsEnabled = true;
+            button_stopServer.IsEnabled = false;
         }
     }
 }

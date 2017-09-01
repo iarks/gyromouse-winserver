@@ -5,10 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GyroMouseServer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="Gyro Mouse" Height="350" Width="525" WindowStartupLocation="CenterScreen" ResizeMode="CanMinimize">
     <Grid>
-        <Button Content="Start Server" HorizontalAlignment="Left" Margin="10,104,0,0" VerticalAlignment="Top" Width="75" Click="Button_Click"/>
-        <Label x:Name="label_ipAddress" Content="Label" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.813,-2.555" Width="497"/>
-        <Label x:Name="label_messages" Content="Label" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,36,0,0" Width="497"/>
+        <Button x:Name="button_startServer" Content="Start Server" Margin="115,171,329,0" VerticalAlignment="Top" Click="Button_Click"/>
+        <Label x:Name="label_ipAddress" Content="" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.813,-2.555" Width="497"/>
+        <Label x:Name="label_messages" Content="Server Stopped" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,285,0,0" Width="497"/>
+        <Button x:Name="button_stopServer" Content="Stop Server" Margin="0,171,211,0" VerticalAlignment="Top" Click="Button_Click_2" IsEnabled="False" HorizontalAlignment="Right" Width="77"/>
     </Grid>
 </Window>
