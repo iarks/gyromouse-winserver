@@ -1,4 +1,6 @@
-﻿using System;
+﻿using WindowsInput;
+using System.Collections;
+using System;
 using System.Windows.Forms;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,10 +13,15 @@ namespace GyroMouseServer
     {
         public void typeIn(String character)
         {
-            if (character.Equals("~"))
+            switch (character)
             {
-                SendKeys.SendWait("+`");
-                return;
+                case "~":
+                case "(":
+                case ")":
+                case "{":
+                case "}":
+                    InputSimulator.SimulateTextEntry(character);
+                    return;
             }
             SendKeys.SendWait(character);
         }

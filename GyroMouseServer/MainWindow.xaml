@@ -1,26 +1,84 @@
-﻿<Window x:Class="GyroMouseServer.MainWindow"
+﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GyroMouseServer"
+        xmlns:Properties="clr-namespace:GyroMouseServer.Properties" x:Class="GyroMouseServer.Window1"
         mc:Ignorable="d"
-        Title="Gyro Mouse" Height="350" Width="525" WindowStartupLocation="CenterScreen" ResizeMode="CanMinimize">
+        Title="Window1" Height="500" Width="700" Background="White" Margin="0" MaxWidth="700" MaxHeight="500" Padding="10" ResizeMode="CanMinimize">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="519"/>
-        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition/>
+            <RowDefinition Height="10"/>
+            <RowDefinition Height="177"/>
+            <RowDefinition Height="36"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="10"/>
         </Grid.RowDefinitions>
-        <Button x:Name="button_startServer" Content="Start Server" Margin="10,171,322,0" VerticalAlignment="Top" Click="Button_Click" Height="20"/>
-        <Label x:Name="label_ipAddress" Content="" Margin="12,196,10,0" VerticalAlignment="Top" RenderTransformOrigin="-0.813,-2.555" Height="26"/>
-        <Label x:Name="label_messages" Content="Server Stopped" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,204,0,0" Width="496" Height="26"/>
-        <Button x:Name="button_stopServer" Content="Stop Server" Margin="309,171,10,0" VerticalAlignment="Top" Click="Button_Click_2" IsEnabled="False" Height="20"/>
-        <Button Content="Button" HorizontalAlignment="Left" Margin="318,265,0,0" VerticalAlignment="Top" Width="75" Height="20"/>
-        <GroupBox Header="Server IP Address" HorizontalAlignment="Right" Height="156" Margin="0,10,24,0" VerticalAlignment="Top" Width="485">
-            <TextBlock HorizontalAlignment="Center" Margin="6,10,6,0" TextWrapping="Wrap" Text="To connect with this PC, add the following IP address as a new Server in the Remote Control app. Your devices need to be connected to the same network." VerticalAlignment="Top" Width="475" Height="35"/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="10"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="10"/>
+        </Grid.ColumnDefinitions>
+
+        <GroupBox Grid.Column="1" Grid.Row="1" Header="IP Details">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="50*"/>
+                    <RowDefinition Height="50*"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Text="To connect with this PC, use the following IP address as a Server IP in the Gyro Mouse app. Your devices need to be connected to the same network" TextWrapping="Wrap" Margin="10"/>
+                
+                <Border Grid.Row="1" >
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock x:Name="textBlock_ip" Grid.Column="0" Text="999.999.999.999" TextAlignment="Center" FontSize="36"/>
+                        <TextBlock x:Name="textBlock_port" Grid.Column="1" Text="99999" TextAlignment="Center" FontSize="36"/>
+                    </Grid>
+                </Border>
+            </Grid>
         </GroupBox>
-        <TextBlock x:Name="textBlock_ipAddress" TextWrapping="Wrap" Margin="9.5,85,12.5,0" Width="497" Height="50" Text="192.168.222.666" FontSize="20" Foreground="#FF005DFF" VerticalAlignment="Top" HorizontalAlignment="Center" Cursor="Cross" IsEnabled="False" Padding="10" UseLayoutRounding="False"/>
+
+        <Border Grid.Row="2" Grid.Column="1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button x:Name="button_startServer" Grid.Column="0" Content="Start Server" Margin="5" Click="button_startServer_Click"/>
+                <Button x:Name="button_stopServer" Content="Stop Server" Grid.Column="1" Margin="5" Click="button_stopServer_Click"/>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="4" Grid.Column="1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="7*"/>
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock x:Name="textBlock_notifications" Grid.Column="0"/>
+                <Border Grid.Column="1">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+                        <Button x:Name="button_settings" Grid.Column="1" ForceCursor="True">
+                            
+                        </Button>
+                        <Button x:Name="button_about" Grid.Column="2"/>
+
+                    </Grid>
+                </Border>
+            </Grid>
+        </Border>
+
     </Grid>
+
 </Window>

@@ -23,7 +23,7 @@ namespace GyroMouseServer_ClientRequestHandler
         private UdpClient newSocket;
         private SynchronizationContext uiThread;
         private String receivedCommand;
-        private System.Windows.Controls.Label label_messages,label_ipAddress;
+        private TextBlock label_messages,label_ipAddress;
         private bool firstVal = false;
         private float dxf, dyf;
 
@@ -42,7 +42,7 @@ namespace GyroMouseServer_ClientRequestHandler
             this.requestQueue = requestQueue;
         }
 
-        public void setUIElements(System.Windows.Controls.Label label_messages, System.Windows.Controls.Label label_ipAddress)
+        public void setUIElements(TextBlock label_messages, TextBlock label_ipAddress)
         {
             this.label_messages = label_messages;
             this.label_ipAddress = label_ipAddress;
@@ -82,8 +82,8 @@ namespace GyroMouseServer_ClientRequestHandler
 
                 uiThread.Send((object state) =>
                 {
-                    label_messages.Content = receivedCommand;
-                    label_ipAddress.Content = Y.ToString() + ":" + X.ToString();
+                    label_messages.Text = receivedCommand;
+                    label_ipAddress.Text = Y.ToString() + ":" + X.ToString();
                 }, null);
 
                 switch (header)
