@@ -97,10 +97,10 @@ namespace GyroMouseServer_ClientRequestHandler
                     case "LU":
                         mouse.leftUp();
                         break;
-                    //case "S":
-                    //    dyf = Float.parseFloat(dy);
-                    //    scrollPage(dyf);
-                    //    break;
+                    case "S":
+                        dyf = float.Parse(param);
+                        mouse.scroll(dyf);
+                        break;
                     case "RD":
                         mouse.rightDown();
                         break;
