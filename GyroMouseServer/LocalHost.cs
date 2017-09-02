@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace GyroMouseServer_LocalHost
 {
-    class LocalHost
+    internal class LocalHost
     {
         public static string getLocalHost()
         {

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace GyroMouseServer
 {
-    class KeyboardInput
+    internal class KeyboardInput
     {
         public void typeIn(String character)
         {

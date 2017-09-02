@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GyroMouseServer"
-        xmlns:Properties="clr-namespace:GyroMouseServer.Properties" x:Class="GyroMouseServer.Window1"
+        xmlns:Properties="clr-namespace:GyroMouseServer.Properties" x:Class="GyroMouseServer.MainWindow"
         mc:Ignorable="d"
         Title="Gyro Mouse Server" Height="500" Width="700" Background="White" Margin="0" MaxWidth="700" MaxHeight="500" Padding="10" ResizeMode="CanMinimize">
     <Grid>
@@ -72,7 +72,7 @@
                     <ColumnDefinition Width="3*"/>
                 </Grid.ColumnDefinitions>
                 <Border Grid.Column="0" BorderThickness="1" BorderBrush="Black">
-                    <TextBlock x:Name="textBlock_notifications"/>
+                    <TextBlock x:Name="textBlock_notifications" Text="test text" FontSize="11" VerticalAlignment="Center" Margin="10,0,0,0"/>
                 </Border>
                     <Border Grid.Column="1">
                     <Grid>

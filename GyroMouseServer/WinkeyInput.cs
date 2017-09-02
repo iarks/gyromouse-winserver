@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace GyroMouseServer
 {
-    class WinkeyInput
+    internal class WinkeyInput
     {
         [DllImport("user32.dll")]
         private static extern void keybd_event(byte bVk, byte bScan, int dwFlags, int dwExtraInfo);

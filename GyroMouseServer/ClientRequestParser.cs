@@ -15,7 +15,7 @@ using System.Windows.Forms;
 
 namespace GyroMouseServer_ClientRequestHandler
 {
-    class ClientRequestParser
+    internal class ClientRequestParser
     {
         private byte[] receivedByte = new Byte[1024];
         private IPEndPoint serverEndPoint;
@@ -80,11 +80,11 @@ namespace GyroMouseServer_ClientRequestHandler
                    
                 }
 
-                uiThread.Send((object state) =>
-                {
-                    label_messages.Text = receivedCommand;
-                    label_ipAddress.Text = Y.ToString() + ":" + X.ToString();
-                }, null);
+                //uiThread.Send((object state) =>
+                //{
+                //    label_messages.Text = receivedCommand;
+                //    label_ipAddress.Text = Y.ToString() + ":" + X.ToString();
+                //}, null);
 
                 switch (header)
                 {

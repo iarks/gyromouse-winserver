@@ -14,7 +14,7 @@ namespace GyroMouseServer
     /// <summary>
     /// Interaction logic for Window1.xaml
     /// </summary>
-    public partial class Window1 : Window
+    public partial class MainWindow : Window
     {
         private IPEndPoint serverEndPoint;
         private UdpClient listeningPort;
@@ -28,7 +28,7 @@ namespace GyroMouseServer
 
         private BlockingCollection<string> blockingCollections;
 
-        public Window1()
+        public MainWindow()
         {
             InitializeComponent();
         }
@@ -41,8 +41,9 @@ namespace GyroMouseServer
             listeningPort = new UdpClient(serverEndPoint);
 
             textBlock_ip.Text = LocalHost.getLocalHost();
+            textBlock_port.Text = serverEndPoint.ToString().Substring(serverEndPoint.ToString().LastIndexOf(':') + 1);
             textBlock_notifications.Text = "Waiting for a client...";
-            textBlock_port.Text = serverEndPoint.ToString();
+            
 
             clientEndpoint = new IPEndPoint(IPAddress.Any, 0);
 
@@ -64,12 +65,12 @@ namespace GyroMouseServer
         {
             clientRequestHandleThread.Abort();
             listeningPort.Close();
-
-            string message = "Server Stopped";
+            
             MainThread.Send((object state) =>
             {
-                textBlock_notifications.Text = message;
+                textBlock_notifications.Text = "Server Stopped";
                 textBlock_ip.Text = "";
+                textBlock_port.Text = "";
             }, null);
 
             button_startServer.IsEnabled = true;

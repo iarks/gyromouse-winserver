@@ -6,7 +6,7 @@ using System.Drawing;
 
 namespace GyroMouseServer_MouseMove
 {
-    class Mouse
+    internal class Mouse
     {
         [DllImport("user32.dll")]
         static extern bool SetCursorPos(int X, int Y);
