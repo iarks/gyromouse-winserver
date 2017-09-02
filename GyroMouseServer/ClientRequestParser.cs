@@ -31,9 +31,9 @@ namespace GyroMouseServer_ClientRequestHandler
 
         private Mouse mouse = new Mouse();
 
-        private BlockingCollection<ClientRequest> requestQueue;
+        private BlockingCollection<string> requestQueue;
 
-        public ClientRequestParser(BlockingCollection<ClientRequest> requestQueue, IPEndPoint serverEndPoint, IPEndPoint clientEndPoint, UdpClient newSocket, SynchronizationContext uiThread)
+        public ClientRequestParser(BlockingCollection<string> requestQueue, IPEndPoint serverEndPoint, IPEndPoint clientEndPoint, UdpClient newSocket, SynchronizationContext uiThread)
         {
             this.serverEndPoint = serverEndPoint;
             this.clientEndPoint = clientEndPoint;

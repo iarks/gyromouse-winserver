@@ -13,11 +13,7 @@ namespace GyroMouseServer_MouseMove
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
         public static extern void mouse_event(uint dwFlags, uint dx, uint dy, uint cButtons, uint dwExtraInfo);
-
         
-        
-        //Cursor cursor = new Cursor(Cursor.Current.Handle);
-
         private const int MOUSEEVENTF_LEFTDOWN = 0x02;
         private const int MOUSEEVENTF_LEFTUP = 0x04;
         private const int MOUSEEVENTF_RIGHTDOWN = 0x08;
@@ -28,16 +24,10 @@ namespace GyroMouseServer_MouseMove
 
         public void movePointer(float x, float y)
         {
-            //Point p = System.Windows.Forms.Cursor.Position;
-            //x = x * 25;
-            //y = y * 25;
-
             int a = (int)x;
             int b = (int)y;
-
-
+            
             SetCursorPos(Cursor.Position.X + a, Cursor.Position.Y + b);
-            //Cursor.Position = new Point(Cursor.Position.X + a, Cursor.Position.Y + b);
         }
 
         public void leftDown()
@@ -70,8 +60,6 @@ namespace GyroMouseServer_MouseMove
 
         public void scroll(float param)
         {
-            //uint X = (uint)Cursor.Position.X;
-            //uint Y = (uint)Cursor.Position.Y;
             mouse_event(MOUSEEVENTF_WHEEL, 0, 0, (uint)param*50, 0);
         }
 

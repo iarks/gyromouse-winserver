@@ -24,7 +24,7 @@ namespace GyroMouseServer
         private ThreadStart clientRequestHandleThreadStart;
         private Thread clientRequestHandleThread;
 
-        private BlockingCollection<ClientRequest> blockingCollections;
+        private BlockingCollection<string> blockingCollections;
 
         public MainWindow()
         {
@@ -43,7 +43,7 @@ namespace GyroMouseServer
 
             clientEndpoint = new IPEndPoint(IPAddress.Any, 0);
 
-            blockingCollections = new BlockingCollection<ClientRequest> { };
+            blockingCollections = new BlockingCollection<string> { };
             
             ClientRequestParser clientRequestHandler = new ClientRequestParser(blockingCollections, serverEndPoint, clientEndpoint, listeningPort, MainThread);
             clientRequestHandler.setUIElements(label_messages,label_ipAddress);

@@ -11,8 +11,12 @@ namespace GyroMouseServer
     {
         public void typeIn(String character)
         {
-            String command = "(" + character + ")";
-            SendKeys.SendWait(command);
+            if (character.Equals("~"))
+            {
+                SendKeys.SendWait("+`");
+                return;
+            }
+            SendKeys.SendWait(character);
         }
     }
 }

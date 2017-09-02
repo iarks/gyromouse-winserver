@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:GyroMouseServer"
         mc:Ignorable="d"
         Title="Gyro Mouse" Height="350" Width="525" WindowStartupLocation="CenterScreen" ResizeMode="CanMinimize">
-    <Grid Margin="10,0,4,1">
+    <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="519"/>
         </Grid.ColumnDefinitions>
