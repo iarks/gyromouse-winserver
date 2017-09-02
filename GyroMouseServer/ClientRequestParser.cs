@@ -58,7 +58,7 @@ namespace GyroMouseServer_ClientRequestHandler
                 receivedByte = newSocket.Receive(ref this.clientEndPoint);
 
                 // received data
-                receivedCommand = Encoding.ASCII.GetString(receivedByte, 0, receivedByte.Length);
+                receivedCommand = Encoding.UTF8.GetString(receivedByte, 0, receivedByte.Length);
 
                 try
                 {
@@ -80,33 +80,33 @@ namespace GyroMouseServer_ClientRequestHandler
                    
                 }
 
-                //uiThread.Send((object state) =>
-                //{
-                //    label_messages.Content = receivedCommand;
-                //    label_ipAddress.Content = Y.ToString() + ":" + X.ToString();
-                //}, null);
+                uiThread.Send((object state) =>
+                {
+                    label_messages.Content = receivedCommand;
+                    label_ipAddress.Content = Y.ToString() + ":" + X.ToString();
+                }, null);
 
                 switch (header)
                 {
                     case "EOT":
                         firstVal = true;
                         break;
-                    //case "LD":
-                    //    LeftDown();
-                    //    break;
-                    //case "LU":
-                    //    LeftUp();
-                    //    break;
+                    case "LD":
+                        mouse.leftDown();
+                        break;
+                    case "LU":
+                        mouse.leftUp();
+                        break;
                     //case "S":
                     //    dyf = Float.parseFloat(dy);
                     //    scrollPage(dyf);
                     //    break;
-                    //case "RD":
-                    //    rightDown();
-                    //    break;
-                    //case "RU":
-                    //    rightUp();
-                    //    break;
+                    case "RD":
+                        mouse.rightDown();
+                        break;
+                    case "RU":
+                        mouse.rightUp();
+                        break;
                     case "BS":
                         WinkeyInput.KeyDown(Keys.Back);
                         WinkeyInput.KeyUp(Keys.Back);
@@ -115,10 +115,9 @@ namespace GyroMouseServer_ClientRequestHandler
                         WinkeyInput.KeyDown(Keys.Enter);
                         WinkeyInput.KeyUp(Keys.Enter);
                         break;
-                    //case "U":
-                    //    dyf = Float.parseFloat(dy);
-                    //    pressUnicode((int)dyf);
-                    //    break;
+                    case "U":
+                        kbi.typeIn(param);
+                        break;
                     case "ESC":
                         WinkeyInput.KeyDown(Keys.Escape);
                         WinkeyInput.KeyUp(Keys.Escape);
