@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:GyroMouseServer"
         xmlns:Properties="clr-namespace:GyroMouseServer.Properties" x:Class="GyroMouseServer.Window1"
         mc:Ignorable="d"
-        Title="Window1" Height="500" Width="700" Background="White" Margin="0" MaxWidth="700" MaxHeight="500" Padding="10" ResizeMode="CanMinimize">
+        Title="Gyro Mouse Server" Height="500" Width="700" Background="White" Margin="0" MaxWidth="700" MaxHeight="500" Padding="10" ResizeMode="CanMinimize">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="10"/>
@@ -34,11 +34,21 @@
                 <Border Grid.Row="1" >
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="1*"/>
-                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock x:Name="textBlock_ip" Grid.Column="0" Text="999.999.999.999" TextAlignment="Center" FontSize="36"/>
-                        <TextBlock x:Name="textBlock_port" Grid.Column="1" Text="99999" TextAlignment="Center" FontSize="36"/>
+                        
+                        <GroupBox Grid.Column="0" Header="IP Address">
+                            <Grid>
+                                <TextBlock x:Name="textBlock_ip" TextAlignment="Center" FontSize="36"/>
+                            </Grid>
+                        </GroupBox>
+
+                        <GroupBox Grid.Column="1" Header="Port Number">
+                            <Grid>
+                                <TextBlock x:Name="textBlock_port" TextAlignment="Center" FontSize="36"/>
+                            </Grid>
+                        </GroupBox>
                     </Grid>
                 </Border>
             </Grid>
@@ -51,7 +61,7 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Button x:Name="button_startServer" Grid.Column="0" Content="Start Server" Margin="5" Click="button_startServer_Click"/>
-                <Button x:Name="button_stopServer" Content="Stop Server" Grid.Column="1" Margin="5" Click="button_stopServer_Click"/>
+                <Button x:Name="button_stopServer" Content="Stop Server" Grid.Column="1" Margin="5" Click="button_stopServer_Click_1"/>
             </Grid>
         </Border>
 
@@ -61,8 +71,10 @@
                     <ColumnDefinition Width="7*"/>
                     <ColumnDefinition Width="3*"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock x:Name="textBlock_notifications" Grid.Column="0"/>
-                <Border Grid.Column="1">
+                <Border Grid.Column="0" BorderThickness="1" BorderBrush="Black">
+                    <TextBlock x:Name="textBlock_notifications"/>
+                </Border>
+                    <Border Grid.Column="1">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="1*"/>

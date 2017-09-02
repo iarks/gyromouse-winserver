@@ -40,8 +40,9 @@ namespace GyroMouseServer
             serverEndPoint = new IPEndPoint(IPAddress.Any, 9050);
             listeningPort = new UdpClient(serverEndPoint);
 
-            textBlock_ip.Text = "Server started at IP : " + LocalHost.getLocalHost() + " Listeneing on port : " + "9050";
+            textBlock_ip.Text = LocalHost.getLocalHost();
             textBlock_notifications.Text = "Waiting for a client...";
+            textBlock_port.Text = serverEndPoint.ToString();
 
             clientEndpoint = new IPEndPoint(IPAddress.Any, 0);
 
@@ -57,8 +58,9 @@ namespace GyroMouseServer
             button_startServer.IsEnabled = false;
             button_stopServer.IsEnabled = true;
         }
+        
 
-        private void button_stopServer_Click(object sender, RoutedEventArgs e)
+        private void button_stopServer_Click_1(object sender, RoutedEventArgs e)
         {
             clientRequestHandleThread.Abort();
             listeningPort.Close();
@@ -66,9 +68,6 @@ namespace GyroMouseServer
             string message = "Server Stopped";
             MainThread.Send((object state) =>
             {
-                //label_ipAddress.C = "";
-
-
                 textBlock_notifications.Text = message;
                 textBlock_ip.Text = "";
             }, null);
