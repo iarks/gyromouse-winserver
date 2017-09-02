@@ -9,7 +9,6 @@ namespace GyroMouseServer
 {
     class KeyboardInput
     {
-        
         public void typeIn(String character)
         {
             String command = "(" + character + ")";

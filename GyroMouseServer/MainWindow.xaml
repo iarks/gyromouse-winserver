@@ -6,11 +6,21 @@
         xmlns:local="clr-namespace:GyroMouseServer"
         mc:Ignorable="d"
         Title="Gyro Mouse" Height="350" Width="525" WindowStartupLocation="CenterScreen" ResizeMode="CanMinimize">
-    <Grid>
-        <Button x:Name="button_startServer" Content="Start Server" Margin="115,171,329,0" VerticalAlignment="Top" Click="Button_Click"/>
-        <Label x:Name="label_ipAddress" Content="" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.813,-2.555" Width="497"/>
-        <Label x:Name="label_messages" Content="Server Stopped" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,285,0,0" Width="497"/>
-        <Button x:Name="button_stopServer" Content="Stop Server" Margin="0,171,211,0" VerticalAlignment="Top" Click="Button_Click_2" IsEnabled="False" HorizontalAlignment="Right" Width="77"/>
-        <Button Content="Button" HorizontalAlignment="Left" Margin="318,265,0,0" VerticalAlignment="Top" Width="75"/>
+    <Grid Margin="10,0,4,1">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="519"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Button x:Name="button_startServer" Content="Start Server" Margin="10,171,322,0" VerticalAlignment="Top" Click="Button_Click" Height="20"/>
+        <Label x:Name="label_ipAddress" Content="" Margin="12,196,10,0" VerticalAlignment="Top" RenderTransformOrigin="-0.813,-2.555" Height="26"/>
+        <Label x:Name="label_messages" Content="Server Stopped" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,204,0,0" Width="496" Height="26"/>
+        <Button x:Name="button_stopServer" Content="Stop Server" Margin="309,171,10,0" VerticalAlignment="Top" Click="Button_Click_2" IsEnabled="False" Height="20"/>
+        <Button Content="Button" HorizontalAlignment="Left" Margin="318,265,0,0" VerticalAlignment="Top" Width="75" Height="20"/>
+        <GroupBox Header="Server IP Address" HorizontalAlignment="Right" Height="156" Margin="0,10,24,0" VerticalAlignment="Top" Width="485">
+            <TextBlock HorizontalAlignment="Center" Margin="6,10,6,0" TextWrapping="Wrap" Text="To connect with this PC, add the following IP address as a new Server in the Remote Control app. Your devices need to be connected to the same network." VerticalAlignment="Top" Width="475" Height="35"/>
+        </GroupBox>
+        <TextBlock x:Name="textBlock_ipAddress" TextWrapping="Wrap" Margin="9.5,85,12.5,0" Width="497" Height="50" Text="192.168.222.666" FontSize="20" Foreground="#FF005DFF" VerticalAlignment="Top" HorizontalAlignment="Center" Cursor="Cross" IsEnabled="False" Padding="10" UseLayoutRounding="False"/>
     </Grid>
 </Window>

@@ -24,7 +24,7 @@ namespace GyroMouseServer
         private ThreadStart clientRequestHandleThreadStart;
         private Thread clientRequestHandleThread;
 
-        private BlockingCollection<string> blockingCollections;
+        private BlockingCollection<ClientRequest> blockingCollections;
 
         public MainWindow()
         {
@@ -43,12 +43,12 @@ namespace GyroMouseServer
 
             clientEndpoint = new IPEndPoint(IPAddress.Any, 0);
 
-            blockingCollections = new BlockingCollection<string> { };
+            blockingCollections = new BlockingCollection<ClientRequest> { };
             
-            ClientRequestHandler clientRequestHandler = new ClientRequestHandler(blockingCollections, serverEndPoint, clientEndpoint, listeningPort, MainThread);
+            ClientRequestParser clientRequestHandler = new ClientRequestParser(blockingCollections, serverEndPoint, clientEndpoint, listeningPort, MainThread);
             clientRequestHandler.setUIElements(label_messages,label_ipAddress);
 
-            clientRequestHandleThreadStart = new ThreadStart(clientRequestHandler.handleRequests);
+            clientRequestHandleThreadStart = new ThreadStart(clientRequestHandler.parseRequests);
             clientRequestHandleThread = new Thread(clientRequestHandleThreadStart);
             clientRequestHandleThread.Start();
 
@@ -65,6 +65,9 @@ namespace GyroMouseServer
             string message = "Server Stopped";
             MainThread.Send((object state) =>
             {
+                textBlock_ipAddress.Text = "";
+               
+
                 label_messages.Content = message;
                 label_ipAddress.Content = "";
             }, null);
