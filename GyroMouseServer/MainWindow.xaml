@@ -81,7 +81,8 @@
                             <ColumnDefinition Width="1*"/>
                             <ColumnDefinition Width="1*"/>
                         </Grid.ColumnDefinitions>
-                        <Button x:Name="button_settings" Grid.Column="1" ForceCursor="True">
+                        <Button x:Name="button_settings" Grid.Column="1" ForceCursor="True" Content="Settings" Click="button_settings_Click">
+                            
                             
                         </Button>
                         <Button x:Name="button_about" Grid.Column="2"/>

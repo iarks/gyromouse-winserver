@@ -76,5 +76,11 @@ namespace GyroMouseServer
             button_startServer.IsEnabled = true;
             button_stopServer.IsEnabled = false;
         }
+
+        private void button_settings_Click(object sender, RoutedEventArgs e)
+        {
+            PreferencesWindow prefWin = new PreferencesWindow();
+            prefWin.Show();
+        }
     }
 }
