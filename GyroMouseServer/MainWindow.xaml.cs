@@ -1,28 +1,20 @@
 ﻿using System;
-using System.Windows.Controls;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
 using System.Windows;
-using System.Windows.Forms;
 using GyroMouseServer_LocalHost;
 using GyroMouseServer_ClientRequestHandler;
 using System.Collections.Concurrent;
-using Microsoft.Toolkit.Uwp.Notifications;
-using System.Xml;
 
 namespace GyroMouseServer
 {
-    /// <summary>
-    /// Interaction logic for Window1.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         private IPEndPoint serverEndPoint;
         private UdpClient listeningPort;
         private IPEndPoint clientEndpoint;
-        private SynchronizationContext MainThread;
+        private SynchronizationContext UIThread;
 
         private ThreadStart clientRequestHandleThreadStart;
         private Thread clientRequestHandleThread;
@@ -34,13 +26,12 @@ namespace GyroMouseServer
         public MainWindow()
         {
             InitializeComponent();
+            UIThread = SynchronizationContext.Current;
         }
     
 
         private void button_startServer_Click(object sender, RoutedEventArgs e)
         {
-            MainThread = SynchronizationContext.Current;
-
             serverEndPoint = new IPEndPoint(IPAddress.Any, Int32.Parse(GyroMouseServer.Properties.Settings.Default.preferredPort));
             listeningPort = new UdpClient(serverEndPoint);
 
@@ -51,9 +42,7 @@ namespace GyroMouseServer
 
             clientEndpoint = new IPEndPoint(IPAddress.Any, 0);
 
-            blockingCollections = new BlockingCollection<string> { };
-
-            ClientRequestParser clientRequestHandler = new ClientRequestParser(blockingCollections, serverEndPoint, clientEndpoint, listeningPort, MainThread);
+            ClientRequestParser clientRequestHandler = new ClientRequestParser(blockingCollections, serverEndPoint, clientEndpoint, listeningPort, UIThread);
             clientRequestHandler.setUIElements(textBlock_notifications, textBlock_ip);
 
             clientRequestHandleThreadStart = new ThreadStart(clientRequestHandler.parseRequests);
@@ -70,7 +59,7 @@ namespace GyroMouseServer
             clientRequestHandleThread.Abort();
             listeningPort.Close();
             
-            MainThread.Send((object state) =>
+            UIThread.Send((object state) =>
             {
                 textBlock_notifications.Text = "Server Stopped";
                 textBlock_ip.Text = "";
@@ -89,8 +78,7 @@ namespace GyroMouseServer
 
         private void button_about_Click(object sender, RoutedEventArgs e)
         {
-            //Preferences pref = new Preferences();
-            //pref.loadPreferences();
+            
         }
     }
 }
