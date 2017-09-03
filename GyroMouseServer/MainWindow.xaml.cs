@@ -11,6 +11,11 @@ using System.Windows.Forms;
 using GyroMouseServer;
 
 
+using System.Windows.Forms;
+using System.Drawing;
+using GyroMouseServer_LocalHost;
+
+
 namespace GyroMouseServer
 {
     public partial class MainWindow : Window
@@ -23,7 +28,7 @@ namespace GyroMouseServer
         private ThreadStart clientRequestHandleThreadStart;
         private Thread clientRequestHandleThread;
 
-
+        NotifyIcon notify = new NotifyIcon();
 
         
 
@@ -38,6 +43,25 @@ namespace GyroMouseServer
             if(GyroMouseServer.Properties.Settings.Default.startMin)
                 this.WindowState = WindowState.Minimized;
             UIThread = SynchronizationContext.Current;
+
+
+            this.notify = new System.Windows.Forms.NotifyIcon();
+            this.notify.Text = "Taskbar Compass";
+            this.notify.Icon = new System.Drawing.Icon(@"D:\Users\Arkadeep\Documents\OneDrive\GyroMouseServer\GyroMouseServer\resources\02_Acrobat.ico");
+            this.notify.Visible = true;
+            this.notify.ContextMenu = new System.Windows.Forms.ContextMenu(new System.Windows.Forms.MenuItem[]
+            {
+            new System.Windows.Forms.MenuItem("Show compass", (s, e) => this.Show()),
+            new System.Windows.Forms.MenuItem("Hide compass", (s, e) => this.Hide()),
+            new System.Windows.Forms.MenuItem("-"),
+            new System.Windows.Forms.MenuItem("Close", (s, e) => this.Close())
+            });
+
+            //if (this.notify != null)
+            //{
+            //    this.notify.Dispose();
+            //}
+
         }
     
 
@@ -65,6 +89,7 @@ namespace GyroMouseServer
 
             Toast.generateToastInfo(5000, "Server Started", LocalHost.getLocalHost() + " : " + serverEndPoint.ToString().Substring(serverEndPoint.ToString().LastIndexOf(':') + 1));
 
+            
 
         }
         
