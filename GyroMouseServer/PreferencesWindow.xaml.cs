@@ -22,25 +22,13 @@ namespace GyroMouseServer
             loadPreferences();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void button_done_click(object sender, RoutedEventArgs e)
         {
             savePrefs();
             Close();
         }
 
-        static void ShowConfig()
-        {
-
-            // For read access you do not need to call OpenExeConfiguraton
-            foreach (string key in ConfigurationManager.AppSettings)
-            {
-                //string value = ConfigurationManager.AppSettings[key];
-                //Console.WriteLine("Key: {0}, Value: {1}", key, value);
-
-            }
-        }
-
-        private void Button_Click_1(object sender, RoutedEventArgs e)
+        private void button_apply_Click(object sender, RoutedEventArgs e)
         {
             savePrefs();
         }
@@ -68,6 +56,15 @@ namespace GyroMouseServer
 
         void savePrefs()
         {
+            GyroMouseServer.Properties.Settings.Default.autoStart = (bool)checkBox_autoStart.IsChecked;
+            GyroMouseServer.Properties.Settings.Default.startMin = (bool)checkBox_minStart.IsChecked;
+            GyroMouseServer.Properties.Settings.Default.minTray = (bool)checkBox_minTray.IsChecked;
+            GyroMouseServer.Properties.Settings.Default.showNotif = (bool)checkBox_showNotif.IsChecked;
+
+            GyroMouseServer.Properties.Settings.Default.sensitivity = (int)slider_sensitivity.Value;
+
+            GyroMouseServer.Properties.Settings.Default.acceleration = (int)slider_acceleration.Value;
+            
             GyroMouseServer.Properties.Settings.Default.Save();
         }
 

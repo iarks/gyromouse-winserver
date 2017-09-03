@@ -84,9 +84,9 @@
             </TabItem>
 
         </TabControl>
-        <Button x:Name="button_done" Content="Done" HorizontalAlignment="Left" Margin="387,20,0,0" Grid.Row="1" Width="75" Grid.Column="1" Click="Button_Click"/>
-        <Button x:Name="button_apply" Content="Apply" HorizontalAlignment="Left" Margin="307,20,0,0" Grid.Row="1" Width="75" Grid.Column="1" Click="Button_Click_1"/>
-        <Button Content="Reset Page" HorizontalAlignment="Left" Margin="227,20,0,0" Grid.Row="1" VerticalAlignment="Top" Width="75" Grid.Column="1" Click="Button_Click_2"/>
+        <Button x:Name="button_done" Content="Done" HorizontalAlignment="Left" Margin="387,20,0,0" Grid.Row="1" Width="75" Grid.Column="1" Click="button_done_click"/>
+        <Button x:Name="button_apply" Content="Apply" HorizontalAlignment="Left" Margin="307,20,0,0" Grid.Row="1" Width="75" Grid.Column="1" Click="button_apply_Click"/>
+        <Button x:Name="button_resetPage" Content="Reset Page" HorizontalAlignment="Left" Margin="227,20,0,0" Grid.Row="1" VerticalAlignment="Top" Width="75" Grid.Column="1" Click="Button_Click_2"/>
 
     </Grid>
 </Window>
