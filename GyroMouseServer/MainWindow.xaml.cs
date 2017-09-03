@@ -21,34 +21,31 @@ namespace GyroMouseServer
         private ThreadStart clientRequestHandleThreadStart;
         private Thread clientRequestHandleThread;
 
-        NotifyIcon notify = new NotifyIcon();
-
-        
-
-
-
+        private NotifyIcon notify;
 
         private BlockingCollection<string> blockingCollections;
 
         public MainWindow()
         {
             InitializeComponent();
-            if(GyroMouseServer.Properties.Settings.Default.startMin)
-                this.WindowState = WindowState.Minimized;
             UIThread = SynchronizationContext.Current;
 
+            if (GyroMouseServer.Properties.Settings.Default.startMin)
+                this.WindowState = WindowState.Minimized;
 
-            this.notify = new System.Windows.Forms.NotifyIcon();
-            this.notify.Text = "Taskbar Compass";
-            this.notify.Icon = new System.Drawing.Icon(@"D:\gyromousewinserver\GyroMouseServer\resources\02_Acrobat.ico");
-            this.notify.Visible = true;
-            this.notify.ContextMenu = new System.Windows.Forms.ContextMenu(new System.Windows.Forms.MenuItem[]
+            this.notify = new NotifyIcon
             {
-            new System.Windows.Forms.MenuItem("Open Window", (s, e) => this.WindowState=WindowState.Normal),
-            new System.Windows.Forms.MenuItem("Close Window", (s, e) => this.WindowState=WindowState.Minimized),
-            new System.Windows.Forms.MenuItem("-"),
-            new System.Windows.Forms.MenuItem("Close", (s, e) => this.Close())
-            });
+                Text = "Gyro Mouse Server",
+                Icon = new System.Drawing.Icon(@"D:\gyromousewinserver\GyroMouseServer\resources\02_Acrobat.ico"),
+                Visible = true,
+                ContextMenu = new ContextMenu(new MenuItem[]
+                {   
+                    new MenuItem("Open Window", (s, e) => this.WindowState=WindowState.Normal),
+                    new MenuItem("Close Window", (s, e) => this.WindowState=WindowState.Minimized),
+                    new MenuItem("-"),
+                    new MenuItem("Exit", (s, e) => this.Close())
+                })
+            };
 
             //if (this.notify != null)
             //{
@@ -125,8 +122,17 @@ namespace GyroMouseServer
             {
                 this.ShowInTaskbar = false;
                 Toast.generateToastInfo(3000, "Hi", "Gyro Mouse Server is running in the system tray");
-            }
-                
+            }   
+        }
+
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        {
+
+            button_stopServer_Click_1(null,null);
+            // Shutdown the application.
+            System.Windows.Application.Current.Shutdown();
+            // OR You can Also go for below logic
+            // Environment.Exit(0);
         }
     }
 }
