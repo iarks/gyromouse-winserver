@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:GyroMouseServer"
         xmlns:Properties="clr-namespace:GyroMouseServer.Properties" x:Class="GyroMouseServer.MainWindow"
         mc:Ignorable="d"
-        Title="Gyro Mouse Server" Height="500" Width="700" Background="White" Margin="0" MaxWidth="700" MaxHeight="500" Padding="10" ResizeMode="CanMinimize">
+        Title="Gyro Mouse Server" Height="500" Width="700" Background="White" Margin="0" MaxWidth="700" MaxHeight="500" Padding="10" ResizeMode="CanMinimize" StateChanged="Window_StateChanged">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="10"/>

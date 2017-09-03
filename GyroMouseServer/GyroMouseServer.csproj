@@ -130,6 +130,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="lib\InputSimulator.dll" />
     <Resource Include="resources\02_Acrobat.ico" />
     <Content Include="resources\ic_settings_black_24px.svg" />
   </ItemGroup>

@@ -14,7 +14,7 @@ using GyroMouseServer;
 using System.Windows.Forms;
 using System.Drawing;
 using GyroMouseServer_LocalHost;
-
+using System.Windows.Input;
 
 namespace GyroMouseServer
 {
@@ -47,12 +47,12 @@ namespace GyroMouseServer
 
             this.notify = new System.Windows.Forms.NotifyIcon();
             this.notify.Text = "Taskbar Compass";
-            this.notify.Icon = new System.Drawing.Icon(@"D:\Users\Arkadeep\Documents\OneDrive\GyroMouseServer\GyroMouseServer\resources\02_Acrobat.ico");
+            this.notify.Icon = new System.Drawing.Icon(@"D:\gyromousewinserver\GyroMouseServer\resources\02_Acrobat.ico");
             this.notify.Visible = true;
             this.notify.ContextMenu = new System.Windows.Forms.ContextMenu(new System.Windows.Forms.MenuItem[]
             {
-            new System.Windows.Forms.MenuItem("Show compass", (s, e) => this.Show()),
-            new System.Windows.Forms.MenuItem("Hide compass", (s, e) => this.Hide()),
+            new System.Windows.Forms.MenuItem("Open Window", (s, e) => this.WindowState=WindowState.Normal),
+            new System.Windows.Forms.MenuItem("Close Window", (s, e) => this.WindowState=WindowState.Minimized),
             new System.Windows.Forms.MenuItem("-"),
             new System.Windows.Forms.MenuItem("Close", (s, e) => this.Close())
             });
@@ -124,9 +124,14 @@ namespace GyroMouseServer
 
         }
 
-        
-
-        
-
+        private void Window_StateChanged(object sender, EventArgs e)
+        {
+            if(this.WindowState.Equals(System.Windows.WindowState.Minimized) && GyroMouseServer.Properties.Settings.Default.minTray)
+            {
+                this.ShowInTaskbar = false;
+                Toast.generateToastInfo(3000, "Hi", "Gyro Mouse Server is running in the system tray");
+            }
+                
+        }
     }
 }
