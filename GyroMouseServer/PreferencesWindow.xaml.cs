@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using Microsoft.Win32;
 
 namespace GyroMouseServer
 {
@@ -37,6 +38,7 @@ namespace GyroMouseServer
         void savePrefs()
         {
             GyroMouseServer.Properties.Settings.Default.autoStart = (bool)checkBox_autoStart.IsChecked;
+            setStartup();
             GyroMouseServer.Properties.Settings.Default.startMin = (bool)checkBox_minStart.IsChecked;
             GyroMouseServer.Properties.Settings.Default.minTray = (bool)checkBox_minTray.IsChecked;
             GyroMouseServer.Properties.Settings.Default.showNotif = (bool)checkBox_showNotif.IsChecked;
@@ -80,5 +82,18 @@ namespace GyroMouseServer
                     break;
             }
         }
+
+        private void setStartup()
+        {
+            RegistryKey rk = Registry.CurrentUser.OpenSubKey
+                ("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+
+            if ((bool)checkBox_autoStart.IsChecked)
+                rk.SetValue("GyroMouseServer", System.Reflection.Assembly.GetExecutingAssembly().Location);
+            else
+                rk.DeleteValue("GyroMouseServer", false);
+
+        }
+
     }
 }

@@ -6,6 +6,10 @@ using System.Windows;
 using GyroMouseServer_LocalHost;
 using GyroMouseServer_ClientRequestHandler;
 using System.Collections.Concurrent;
+using Microsoft.Win32;
+using System.Windows.Forms;
+using GyroMouseServer;
+
 
 namespace GyroMouseServer
 {
@@ -19,13 +23,20 @@ namespace GyroMouseServer
         private ThreadStart clientRequestHandleThreadStart;
         private Thread clientRequestHandleThread;
 
+
+
         
+
+
+
 
         private BlockingCollection<string> blockingCollections;
 
         public MainWindow()
         {
             InitializeComponent();
+            if(GyroMouseServer.Properties.Settings.Default.startMin)
+                this.WindowState = WindowState.Minimized;
             UIThread = SynchronizationContext.Current;
         }
     
@@ -51,6 +62,10 @@ namespace GyroMouseServer
 
             button_startServer.IsEnabled = false;
             button_stopServer.IsEnabled = true;
+
+            Toast.generateToastInfo(5000, "Server Started", LocalHost.getLocalHost() + " : " + serverEndPoint.ToString().Substring(serverEndPoint.ToString().LastIndexOf(':') + 1));
+
+
         }
         
 
@@ -78,7 +93,15 @@ namespace GyroMouseServer
 
         private void button_about_Click(object sender, RoutedEventArgs e)
         {
-            
+            this.WindowState = System.Windows.WindowState.Minimized;
+            Toast.generateToastInfo(3000, "Hi", "This is a BallonTip from Windows Notification");
+
+
         }
+
+        
+
+        
+
     }
 }
