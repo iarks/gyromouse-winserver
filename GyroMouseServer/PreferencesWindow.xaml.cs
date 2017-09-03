@@ -67,25 +67,25 @@ namespace GyroMouseServer
 
         private void button_resetPage_Click(object sender, RoutedEventArgs e)
         {
-
-            loadDefaults(1);
+            int currentTab = PreferencesTab.SelectedIndex;
+            loadDefaults(currentTab);
         }
 
         void loadDefaults(int tabNumber)
         {
             switch(tabNumber)
             {
-                case 1:
+                case 0:
                     checkBox_autoStart.IsChecked = DefaultPreferences.autoStart;
                     checkBox_minStart.IsChecked = DefaultPreferences.startMin;
                     checkBox_minTray.IsChecked = DefaultPreferences.minTray;
                     checkBox_showNotif.IsChecked = DefaultPreferences.showNotif;
                     break;
-                case 2:
+                case 1:
                     slider_sensitivity.Value = DefaultPreferences.sensitivity;
                     slider_acceleration.Value = DefaultPreferences.acceleration;
                     break;
-                case 3:
+                case 2:
                     textBox_preferredPort.Text = DefaultPreferences.preferredPort;
                     break;
             }
