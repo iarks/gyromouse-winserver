@@ -60,7 +60,8 @@ namespace GyroMouseServer_MouseMove
 
         public void scroll(float param)
         {
-            mouse_event(MOUSEEVENTF_WHEEL, 0, 0, (uint)param*50, 0);
+            int acceleration = GyroMouseServer.Properties.Settings.Default.acceleration;
+            mouse_event(MOUSEEVENTF_WHEEL, 0, 0, (uint)param*(uint)acceleration, 0);
         }
 
     }

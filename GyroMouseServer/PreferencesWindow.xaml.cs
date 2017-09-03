@@ -56,7 +56,9 @@ namespace GyroMouseServer
             GyroMouseServer.Properties.Settings.Default.sensitivity = (int)slider_sensitivity.Value;
 
             GyroMouseServer.Properties.Settings.Default.acceleration = (int)slider_acceleration.Value;
-            
+
+            GyroMouseServer.Properties.Settings.Default.preferredPort = textBox_preferredPort.Text;
+
             GyroMouseServer.Properties.Settings.Default.Save();
         }
 

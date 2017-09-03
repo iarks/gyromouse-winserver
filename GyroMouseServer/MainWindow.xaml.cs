@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System;
+using System.Windows.Controls;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -8,6 +9,8 @@ using System.Windows.Forms;
 using GyroMouseServer_LocalHost;
 using GyroMouseServer_ClientRequestHandler;
 using System.Collections.Concurrent;
+using Microsoft.Toolkit.Uwp.Notifications;
+using System.Xml;
 
 namespace GyroMouseServer
 {
@@ -32,12 +35,13 @@ namespace GyroMouseServer
         {
             InitializeComponent();
         }
+    
 
         private void button_startServer_Click(object sender, RoutedEventArgs e)
         {
             MainThread = SynchronizationContext.Current;
 
-            serverEndPoint = new IPEndPoint(IPAddress.Any, 9050);
+            serverEndPoint = new IPEndPoint(IPAddress.Any, Int32.Parse(GyroMouseServer.Properties.Settings.Default.preferredPort));
             listeningPort = new UdpClient(serverEndPoint);
 
             textBlock_ip.Text = LocalHost.getLocalHost();
