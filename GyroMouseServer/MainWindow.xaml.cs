@@ -6,15 +6,8 @@ using System.Windows;
 using GyroMouseServer_LocalHost;
 using GyroMouseServer_ClientRequestHandler;
 using System.Collections.Concurrent;
-using Microsoft.Win32;
 using System.Windows.Forms;
-using GyroMouseServer;
 
-
-using System.Windows.Forms;
-using System.Drawing;
-using GyroMouseServer_LocalHost;
-using System.Windows.Input;
 
 namespace GyroMouseServer
 {
@@ -62,6 +55,8 @@ namespace GyroMouseServer
             //    this.notify.Dispose();
             //}
 
+            if (GyroMouseServer.Properties.Settings.Default.autoServe)
+                button_startServer_Click(null, null);
         }
     
 

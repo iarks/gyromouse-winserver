@@ -31,13 +31,15 @@
                         <RowDefinition Height="40"/>
                         <RowDefinition Height="40"/>
                         <RowDefinition Height="40"/>
+                        <RowDefinition Height="40"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="10"/>
                     </Grid.RowDefinitions>
                     <CheckBox x:Name="checkBox_autoStart" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center" Content="Start when Windows starts" Margin="10,0,0,0"/>
-                    <CheckBox x:Name="checkBox_minStart" Grid.Column="1" Grid.Row="2" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center" Content="Start minimised" Margin="10,0,0,0"/>
-                    <CheckBox x:Name="checkBox_minTray" Grid.Column="1" Grid.Row="3" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center" Content="Minimise to tray" Margin="10,0,0,0"/>
-                    <CheckBox x:Name="checkBox_showNotif" Grid.Column="1" Grid.Row="4" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center" Content="Show Notifications" Margin="10,0,0,0"/>
+                    <CheckBox x:Name="checkBox_autoServer" Grid.Column="1" Grid.Row="2" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center" Content="Start server on application open" Margin="10,0,0,0"/>
+                    <CheckBox x:Name="checkBox_minStart" Grid.Column="1" Grid.Row="3" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center" Content="Start minimised" Margin="10,0,0,0"/>
+                    <CheckBox x:Name="checkBox_minTray" Grid.Column="1" Grid.Row="4" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center" Content="Minimise to tray" Margin="10,0,0,0"/>
+                    <CheckBox x:Name="checkBox_showNotif" Grid.Column="1" Grid.Row="5" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center" Content="Show Notifications" Margin="10,0,0,0"/>
 
                 </Grid>
             </TabItem>

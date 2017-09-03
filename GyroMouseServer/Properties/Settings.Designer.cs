@@ -106,5 +106,17 @@ namespace GyroMouseServer.Properties {
                 this["preferredPort"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool autoServe {
+            get {
+                return ((bool)(this["autoServe"]));
+            }
+            set {
+                this["autoServe"] = value;
+            }
+        }
     }
 }

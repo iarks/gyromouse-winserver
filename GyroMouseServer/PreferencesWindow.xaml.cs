@@ -25,6 +25,7 @@ namespace GyroMouseServer
         void loadPreferences()
         {
             checkBox_autoStart.IsChecked = GyroMouseServer.Properties.Settings.Default.autoStart;
+            checkBox_autoServer.IsChecked = GyroMouseServer.Properties.Settings.Default.autoServe;
             checkBox_minStart.IsChecked = GyroMouseServer.Properties.Settings.Default.startMin;
             checkBox_minTray.IsChecked = GyroMouseServer.Properties.Settings.Default.minTray;
             checkBox_showNotif.IsChecked = GyroMouseServer.Properties.Settings.Default.showNotif;
@@ -39,6 +40,7 @@ namespace GyroMouseServer
         {
             GyroMouseServer.Properties.Settings.Default.autoStart = (bool)checkBox_autoStart.IsChecked;
             setStartup();
+            GyroMouseServer.Properties.Settings.Default.autoServe = (bool)checkBox_autoServer.IsChecked;
             GyroMouseServer.Properties.Settings.Default.startMin = (bool)checkBox_minStart.IsChecked;
             GyroMouseServer.Properties.Settings.Default.minTray = (bool)checkBox_minTray.IsChecked;
             GyroMouseServer.Properties.Settings.Default.showNotif = (bool)checkBox_showNotif.IsChecked;
