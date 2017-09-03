@@ -85,7 +85,7 @@
                             
                             
                         </Button>
-                        <Button x:Name="button_about" Grid.Column="2"/>
+                        <Button x:Name="button_about" Grid.Column="2" Click="button_about_Click"/>
 
                     </Grid>
                 </Border>

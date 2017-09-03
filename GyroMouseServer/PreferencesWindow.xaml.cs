@@ -14,27 +14,18 @@ using System.Configuration;
 
 namespace GyroMouseServer
 {
-    /// <summary>
-    /// Interaction logic for PreferencesWindow.xaml
-    /// </summary>
     public partial class PreferencesWindow : Window
     {
-        Configuration config;
         public PreferencesWindow()
         {
             InitializeComponent();
-            config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-
+            loadPreferences();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            Console.WriteLine("HERE!");
-            config.AppSettings.Settings.Add("ModificationDate", DateTime.Now.ToLongTimeString() + " ");
-            config.Save(ConfigurationSaveMode.Modified);
-
-            //string value = ConfigurationManager.AppSettings["setting2"];
-            //Console.WriteLine("Key: {0}, Value: {1}", "setting2", value);
+            savePrefs();
+            Close();
         }
 
         static void ShowConfig()
@@ -43,10 +34,46 @@ namespace GyroMouseServer
             // For read access you do not need to call OpenExeConfiguraton
             foreach (string key in ConfigurationManager.AppSettings)
             {
-                string value = ConfigurationManager.AppSettings[key];
-                Console.WriteLine("Key: {0}, Value: {1}", key, value);
+                //string value = ConfigurationManager.AppSettings[key];
+                //Console.WriteLine("Key: {0}, Value: {1}", key, value);
+
             }
         }
 
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            savePrefs();
+        }
+
+        private void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        void loadPreferences()
+        {
+            checkBox_autoStart.IsChecked = GyroMouseServer.Properties.Settings.Default.autoStart;
+            checkBox_minStart.IsChecked = GyroMouseServer.Properties.Settings.Default.startMin;
+            checkBox_minTray.IsChecked = GyroMouseServer.Properties.Settings.Default.minTray;
+            checkBox_showNotif.IsChecked = GyroMouseServer.Properties.Settings.Default.showNotif;
+
+            slider_sensitivity.Value = GyroMouseServer.Properties.Settings.Default.sensitivity;
+            slider_acceleration.Value = GyroMouseServer.Properties.Settings.Default.acceleration;
+            
+            textBox_preferredPort.Text = GyroMouseServer.Properties.Settings.Default.preferredPort;    
+        }
+
+
+
+
+        void savePrefs()
+        {
+            GyroMouseServer.Properties.Settings.Default.Save();
+        }
+
+        private void checkBox_autoStart_Click(object sender, RoutedEventArgs e)
+        {
+            GyroMouseServer.Properties.Settings.Default.autoStart = (bool)checkBox_autoStart.IsChecked;
+        }
     }
 }

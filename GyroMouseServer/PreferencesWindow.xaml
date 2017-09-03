@@ -17,12 +17,11 @@
             <RowDefinition Height="40"/>
             <RowDefinition Height="10"/>
         </Grid.RowDefinitions>
-        <TabControl Grid.Row="0" Grid.Column="1">
-            <TabItem Header="Startup">
+        <TabControl x:Name="PreferencesTab" Grid.Row="0" Grid.Column="1">
+            <TabItem Header="Startup" Height="22" VerticalAlignment="Top">
                 <Grid Background="#FFE5E5E5">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="10"/>
-                        <ColumnDefinition Width="40"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="10"/>
                     </Grid.ColumnDefinitions>
@@ -35,14 +34,10 @@
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="10"/>
                     </Grid.RowDefinitions>
-                    <CheckBox Grid.Column="1" Grid.Row="1" HorizontalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center"/>
-                    <CheckBox Grid.Column="1" Grid.Row="2" HorizontalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center"/>
-                    <CheckBox Grid.Column="1" Grid.Row="3" HorizontalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center"/>
-                    <CheckBox Grid.Column="1" Grid.Row="4" HorizontalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center"/>
-                    <TextBlock Grid.Column="2" HorizontalAlignment="Left" Margin="10,0,0,0" Grid.Row="1" TextWrapping="Wrap" Text="Start when Windows starts" VerticalAlignment="Center" Width="auto"/>
-                    <TextBlock Grid.Column="2" HorizontalAlignment="Left" Margin="10,0,0,0" Grid.Row="2" TextWrapping="Wrap" Text="Start Minimised" VerticalAlignment="Center"/>
-                    <TextBlock Grid.Column="2" HorizontalAlignment="Left" Margin="10,0,0,0" Grid.Row="3" TextWrapping="Wrap" Text="Minimise to tray" VerticalAlignment="Center"/>
-                    <TextBlock Grid.Column="2" HorizontalAlignment="Left" Margin="10,0,0,0" Grid.Row="4" TextWrapping="Wrap" VerticalAlignment="Center"><Run Text="Show n"/><Run Text="otifications"/></TextBlock>
+                    <CheckBox x:Name="checkBox_autoStart" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center" Content="Start when Windows starts" Margin="10,0,0,0"/>
+                    <CheckBox x:Name="checkBox_minStart" Grid.Column="1" Grid.Row="2" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center" Content="Start minimised" Margin="10,0,0,0"/>
+                    <CheckBox x:Name="checkBox_minTray" Grid.Column="1" Grid.Row="3" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center" Content="Minimise to tray" Margin="10,0,0,0"/>
+                    <CheckBox x:Name="checkBox_showNotif" Grid.Column="1" Grid.Row="4" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center" Content="Show Notifications" Margin="10,0,0,0"/>
 
                 </Grid>
             </TabItem>
@@ -62,8 +57,8 @@
                         <ColumnDefinition Width="322*"/>
                         <ColumnDefinition Width="13*"/>
                     </Grid.ColumnDefinitions>
-                    <Slider Grid.Column="2" Grid.Row="1" Margin="10"/>
-                    <Slider Grid.Column="2" Margin="10" Grid.Row="2"/>
+                    <Slider x:Name="slider_sensitivity" Grid.Column="2" Grid.Row="1" Margin="10" Maximum="100" SmallChange="1"/>
+                    <Slider x:Name="slider_acceleration" Grid.Column="2" Margin="10" Grid.Row="2" Maximum="100" SmallChange="1"/>
                     <TextBlock Grid.Column="1" Grid.Row="1" Margin="10" TextWrapping="Wrap" VerticalAlignment="Center" Text="Mouse Sensitivity"/>
                     <TextBlock Grid.Column="1" Grid.Row="2" Margin="10" TextWrapping="Wrap" Text="Scroll Acceleration" VerticalAlignment="Center"/>
                 </Grid>
@@ -84,14 +79,14 @@
                         <RowDefinition Height="10"/>
                     </Grid.RowDefinitions>
                     <TextBlock Grid.Column="1" Margin="10,12,0,12" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Center" Text="Override Port address" Height="16"/>
-                    <TextBox Grid.Column="2" Height="24" Margin="10,0,10,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                    <TextBox x:Name="textBox_preferredPort" Grid.Column="2" Height="24" Margin="10,0,10,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
                 </Grid>
             </TabItem>
 
         </TabControl>
-        <Button Content="Done" HorizontalAlignment="Left" Margin="387,20,0,0" Grid.Row="1" Width="75" Grid.Column="1" Click="Button_Click"/>
-        <Button Content="Apply" HorizontalAlignment="Left" Margin="307,20,0,0" Grid.Row="1" Width="75" Grid.Column="1"/>
-        <Button Content="Reset Page" HorizontalAlignment="Left" Margin="227,20,0,0" Grid.Row="1" VerticalAlignment="Top" Width="75" Grid.Column="1"/>
+        <Button x:Name="button_done" Content="Done" HorizontalAlignment="Left" Margin="387,20,0,0" Grid.Row="1" Width="75" Grid.Column="1" Click="Button_Click"/>
+        <Button x:Name="button_apply" Content="Apply" HorizontalAlignment="Left" Margin="307,20,0,0" Grid.Row="1" Width="75" Grid.Column="1" Click="Button_Click_1"/>
+        <Button Content="Reset Page" HorizontalAlignment="Left" Margin="227,20,0,0" Grid.Row="1" VerticalAlignment="Top" Width="75" Grid.Column="1" Click="Button_Click_2"/>
 
     </Grid>
 </Window>

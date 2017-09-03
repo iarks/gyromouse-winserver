@@ -82,5 +82,11 @@ namespace GyroMouseServer
             PreferencesWindow prefWin = new PreferencesWindow();
             prefWin.Show();
         }
+
+        private void button_about_Click(object sender, RoutedEventArgs e)
+        {
+            //Preferences pref = new Preferences();
+            //pref.loadPreferences();
+        }
     }
 }
