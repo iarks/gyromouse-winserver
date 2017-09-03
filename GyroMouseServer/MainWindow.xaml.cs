@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Drawing;
+using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -7,7 +8,8 @@ using GyroMouseServer_LocalHost;
 using GyroMouseServer_ClientRequestHandler;
 using System.Collections.Concurrent;
 using System.Windows.Forms;
-
+using Windows.UI.Notifications;
+using Windows.Data.Xml.Dom;
 
 namespace GyroMouseServer
 {
@@ -25,6 +27,8 @@ namespace GyroMouseServer
 
         private BlockingCollection<string> blockingCollections;
 
+        ToastNotification toast;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -36,7 +40,7 @@ namespace GyroMouseServer
             this.notify = new NotifyIcon
             {
                 Text = "Gyro Mouse Server",
-                Icon = new System.Drawing.Icon(@"D:\gyromousewinserver\GyroMouseServer\resources\02_Acrobat.ico"),
+                Icon = SystemIcons.Information,
                 Visible = true,
                 ContextMenu = new ContextMenu(new MenuItem[]
                 {   
@@ -47,15 +51,43 @@ namespace GyroMouseServer
                 })
             };
 
-            //if (this.notify != null)
-            //{
-            //    this.notify.Dispose();
-            //}
-
             if (GyroMouseServer.Properties.Settings.Default.autoServe)
                 button_startServer_Click(null, null);
+
+            XmlDocument toastXml = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastImageAndText04);
+
+            // Fill in the text elements
+            XmlNodeList stringElements = toastXml.GetElementsByTagName("text");
+            for (int i = 0; i < stringElements.Length; i++)
+            {
+                stringElements[i].AppendChild(toastXml.CreateTextNode("Line " + i));
+            }
+
+            // Specify the absolute path to an image
+            //String imagePath = "file:///" + Path.GetFullPath("toastImageAndText.png");
+            //XmlNodeList imageElements = toastXml.GetElementsByTagName("image");
+
+            toast = new ToastNotification(toastXml);
+
+            toast.Activated += ToastActivated;
+            toast.Dismissed += ToastDismissed;
+            toast.Failed += ToastFailed;
         }
-    
+
+        private void ToastFailed(ToastNotification sender, ToastFailedEventArgs args)
+        {
+            //throw new NotImplementedException();
+        }
+
+        private void ToastDismissed(ToastNotification sender, ToastDismissedEventArgs args)
+        {
+            //throw new NotImplementedException();
+        }
+
+        private void ToastActivated(ToastNotification sender, object args)
+        {
+            //throw new NotImplementedException();
+        }
 
         private void button_startServer_Click(object sender, RoutedEventArgs e)
         {
@@ -110,8 +142,11 @@ namespace GyroMouseServer
 
         private void button_about_Click(object sender, RoutedEventArgs e)
         {
-            this.WindowState = System.Windows.WindowState.Minimized;
-            Toast.generateToastInfo(3000, "Hi", "This is a BallonTip from Windows Notification");
+            //this.WindowState = System.Windows.WindowState.Minimized;
+            //Toast.generateToastInfo(3000, "Hi", "This is a BallonTip from Windows Notification");
+
+            ToastNotificationManager.CreateToastNotifier("GyroMouseServer").Show(toast);
+           
 
 
         }
@@ -127,6 +162,10 @@ namespace GyroMouseServer
 
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
+            if (this.notify != null)
+            {
+                this.notify.Dispose();
+            }
 
             button_stopServer_Click_1(null,null);
             // Shutdown the application.
