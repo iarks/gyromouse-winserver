@@ -71,6 +71,7 @@ namespace GyroMouseServer
             {
                 case 0:
                     checkBox_autoStart.IsChecked = DefaultPreferences.autoStart;
+                    checkBox_autoServer.IsChecked = DefaultPreferences.autoServe;
                     checkBox_minStart.IsChecked = DefaultPreferences.startMin;
                     checkBox_minTray.IsChecked = DefaultPreferences.minTray;
                     checkBox_showNotif.IsChecked = DefaultPreferences.showNotif;
