@@ -33,11 +33,6 @@ namespace GyroMouseServer
             savePrefs();
         }
 
-        private void Button_Click_2(object sender, RoutedEventArgs e)
-        {
-
-        }
-
         void loadPreferences()
         {
             checkBox_autoStart.IsChecked = GyroMouseServer.Properties.Settings.Default.autoStart;
@@ -50,10 +45,7 @@ namespace GyroMouseServer
             
             textBox_preferredPort.Text = GyroMouseServer.Properties.Settings.Default.preferredPort;    
         }
-
-
-
-
+        
         void savePrefs()
         {
             GyroMouseServer.Properties.Settings.Default.autoStart = (bool)checkBox_autoStart.IsChecked;
@@ -71,6 +63,32 @@ namespace GyroMouseServer
         private void checkBox_autoStart_Click(object sender, RoutedEventArgs e)
         {
             GyroMouseServer.Properties.Settings.Default.autoStart = (bool)checkBox_autoStart.IsChecked;
+        }
+
+        private void button_resetPage_Click(object sender, RoutedEventArgs e)
+        {
+
+            loadDefaults(1);
+        }
+
+        void loadDefaults(int tabNumber)
+        {
+            switch(tabNumber)
+            {
+                case 1:
+                    checkBox_autoStart.IsChecked = DefaultPreferences.autoStart;
+                    checkBox_minStart.IsChecked = DefaultPreferences.startMin;
+                    checkBox_minTray.IsChecked = DefaultPreferences.minTray;
+                    checkBox_showNotif.IsChecked = DefaultPreferences.showNotif;
+                    break;
+                case 2:
+                    slider_sensitivity.Value = DefaultPreferences.sensitivity;
+                    slider_acceleration.Value = DefaultPreferences.acceleration;
+                    break;
+                case 3:
+                    textBox_preferredPort.Text = DefaultPreferences.preferredPort;
+                    break;
+            }
         }
     }
 }
