@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System.Windows.Forms.VisualStyles;
+using System.Drawing;
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -10,6 +11,7 @@ using System.Collections.Concurrent;
 using System.Windows.Forms;
 using Windows.UI.Notifications;
 using Windows.Data.Xml.Dom;
+using System.Text;
 
 namespace GyroMouseServer
 {
@@ -28,6 +30,9 @@ namespace GyroMouseServer
         private BlockingCollection<string> blockingCollections;
 
         ToastNotification toast;
+
+        ThreadStart waitingOnClientThreadStart;
+        Thread waitingOnClientThread;
 
         public MainWindow()
         {
@@ -101,12 +106,16 @@ namespace GyroMouseServer
 
             clientEndpoint = new IPEndPoint(IPAddress.Any, 0);
 
+
+            waitingOnClientThread = new Thread(() => waitingOnClient(blockingCollections, serverEndPoint, clientEndpoint, listeningPort, UIThread));
+            waitingOnClientThread.Start();
+
             ClientRequestParser clientRequestHandler = new ClientRequestParser(blockingCollections, serverEndPoint, clientEndpoint, listeningPort, UIThread);
             clientRequestHandler.setUIElements(textBlock_notifications, textBlock_ip);
 
-            clientRequestHandleThreadStart = new ThreadStart(clientRequestHandler.parseRequests);
-            clientRequestHandleThread = new Thread(clientRequestHandleThreadStart);
-            clientRequestHandleThread.Start();
+//            clientRequestHandleThreadStart = new ThreadStart(clientRequestHandler.parseRequests);
+//            clientRequestHandleThread = new Thread(clientRequestHandleThreadStart);
+//            clientRequestHandleThread.Start();
 
             button_startServer.IsEnabled = false;
             button_stopServer.IsEnabled = true;
@@ -120,7 +129,8 @@ namespace GyroMouseServer
 
         private void button_stopServer_Click_1(object sender, RoutedEventArgs e)
         {
-            clientRequestHandleThread.Abort();
+            if(clientRequestHandleThread!=null && clientRequestHandleThread.IsAlive)
+                clientRequestHandleThread.Abort();
             listeningPort.Close();
             
             UIThread.Send((object state) =>
@@ -172,6 +182,28 @@ namespace GyroMouseServer
             System.Windows.Application.Current.Shutdown();
             // OR You can Also go for below logic
             // Environment.Exit(0);
+        }
+
+        private void waitingOnClient(BlockingCollection<string> blockingCollection,IPEndPoint server, IPEndPoint client,UdpClient port,SynchronizationContext UIThread)
+        {
+            Label:
+            Byte[] data = listeningPort.Receive(ref client);
+            Console.WriteLine("Message received from {0}:", client.ToString());
+            Console.WriteLine(Encoding.ASCII.GetString(data, 0, data.Length));
+
+            Console.WriteLine("Message received from {0}:", client.ToString());
+            Console.WriteLine(Encoding.ASCII.GetString(data, 0, data.Length));
+
+            string welcome = LocalHost.getLocalHost();
+
+            if (Encoding.ASCII.GetString(data, 0, data.Length) == "DICK MOVE")
+            {
+                data = Encoding.ASCII.GetBytes(welcome);
+                listeningPort.Send(data, data.Length, client);
+            }
+            else
+                goto Label;
+                
         }
     }
 }
