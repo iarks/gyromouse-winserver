@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Linq.Expressions;
+using System;
 using System.Text;
 using System.Net;
 using System.Net.Sockets;
@@ -65,6 +66,8 @@ namespace GyroMouseServer_ClientRequestHandler
                 // received data
                 receivedCommand = Encoding.UTF8.GetString(receivedByte, 0, receivedByte.Length);
 
+                
+
                 try
                 {
                     // converting it to json
@@ -78,7 +81,9 @@ namespace GyroMouseServer_ClientRequestHandler
 
                     header = X.ToString();
                     param = Y.ToString();
+
                     
+
                 }
                 catch (Exception e)
                 {
@@ -91,75 +96,83 @@ namespace GyroMouseServer_ClientRequestHandler
                 //    label_ipAddress.Text = Y.ToString() + ":" + X.ToString();
                 //}, null);
 
-                switch (header)
+                try
                 {
-                    case "EOT":
-                        firstVal = true;
-                        break;
-                    case "LD":
-                        mouse.leftDown();
-                        break;
-                    case "LU":
-                        mouse.leftUp();
-                        break;
-                    case "S":
-                        dyf = float.Parse(param);
-                        mouse.scroll(dyf);
-                        break;
-                    case "RD":
-                        mouse.rightDown();
-                        break;
-                    case "RU":
-                        mouse.rightUp();
-                        break;
-                    case "BS":
-                        WinkeyInput.KeyDown(Keys.Back);
-                        WinkeyInput.KeyUp(Keys.Back);
-                        break;
-                    case "EN":
-                        WinkeyInput.KeyDown(Keys.Enter);
-                        WinkeyInput.KeyUp(Keys.Enter);
-                        break;
-                    case "U":
-                        kbi.typeIn(param);
-                        break;
-                    case "ESC":
-                        WinkeyInput.KeyDown(Keys.Escape);
-                        WinkeyInput.KeyUp(Keys.Escape);
-                        break;
-                    case "WIN":
-                        WinkeyInput.KeyDown(Keys.LWin);
-                        WinkeyInput.KeyUp(Keys.LWin);
-                        break;
-                    case "AL":
-                        WinkeyInput.KeyDown(Keys.Right);
-                        WinkeyInput.KeyUp(Keys.Right);
-                        break;
-                    case "AR":
-                        WinkeyInput.KeyDown(Keys.Left);
-                        WinkeyInput.KeyUp(Keys.Left);
-                        break;
-                    case "AD":
-                        WinkeyInput.KeyDown(Keys.Down);
-                        WinkeyInput.KeyUp(Keys.Down);
-                        break;
-                    case "AU":
-                        WinkeyInput.KeyDown(Keys.Up);
-                        WinkeyInput.KeyUp(Keys.Up);
-                        break;
-                    default:
-                        dxf = float.Parse(header);
-                        dyf = float.Parse(param);
-                        if (!firstVal)
-                        {
-                            mouse.movePointer(dxf * 25, dyf * 25);
-                        }
-                        else
-                        {
-                            firstVal = false;
-                        }
-                        break;
 
+                    switch (header)
+                    {
+                        case "EOT":
+                            firstVal = true;
+                            break;
+                        case "LD":
+                            mouse.leftDown();
+                            break;
+                        case "LU":
+                            mouse.leftUp();
+                            break;
+                        case "S":
+                            dyf = float.Parse(param);
+                            mouse.scroll(dyf);
+                            break;
+                        case "RD":
+                            mouse.rightDown();
+                            break;
+                        case "RU":
+                            mouse.rightUp();
+                            break;
+                        case "BS":
+                            WinkeyInput.KeyDown(Keys.Back);
+                            WinkeyInput.KeyUp(Keys.Back);
+                            break;
+                        case "EN":
+                            WinkeyInput.KeyDown(Keys.Enter);
+                            WinkeyInput.KeyUp(Keys.Enter);
+                            break;
+                        case "U":
+                            kbi.typeIn(param);
+                            break;
+                        case "ESC":
+                            WinkeyInput.KeyDown(Keys.Escape);
+                            WinkeyInput.KeyUp(Keys.Escape);
+                            break;
+                        case "WIN":
+                            WinkeyInput.KeyDown(Keys.LWin);
+                            WinkeyInput.KeyUp(Keys.LWin);
+                            break;
+                        case "AL":
+                            WinkeyInput.KeyDown(Keys.Right);
+                            WinkeyInput.KeyUp(Keys.Right);
+                            break;
+                        case "AR":
+                            WinkeyInput.KeyDown(Keys.Left);
+                            WinkeyInput.KeyUp(Keys.Left);
+                            break;
+                        case "AD":
+                            WinkeyInput.KeyDown(Keys.Down);
+                            WinkeyInput.KeyUp(Keys.Down);
+                            break;
+                        case "AU":
+                            WinkeyInput.KeyDown(Keys.Up);
+                            WinkeyInput.KeyUp(Keys.Up);
+                            break;
+                        default:
+                            dxf = float.Parse(header);
+                            dyf = float.Parse(param);
+                            if (!firstVal)
+                            {
+                                mouse.movePointer(dxf * 25, dyf * 25);
+                            }
+                            else
+                            {
+                                firstVal = false;
+                            }
+                            break;
+
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.Write(header + "," + param);
                 }
 
                 //sending a message back to client
