@@ -85,6 +85,7 @@
     <Compile Include="PreferencesWindow.xaml.cs">
       <DependentUpon>PreferencesWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="TCPClientListener.cs" />
     <Compile Include="Toast.cs" />
     <Compile Include="WinkeyInput.cs" />
     <Compile Include="App.xaml.cs">
