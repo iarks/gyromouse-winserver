@@ -23,6 +23,7 @@ namespace GyroMouseServer_ClientRequestHandler
         private TextBlock label_messages,label_ipAddress;
         private bool firstVal = false;
         private float dxf, dyf;
+        private Barrier sync;
 
         private KeyboardInput kbi = new KeyboardInput();
 
@@ -30,13 +31,14 @@ namespace GyroMouseServer_ClientRequestHandler
 
         private BlockingCollection<string> requestQueue;
 
-        public ClientRequestParser(BlockingCollection<string> requestQueue, IPEndPoint serverEndPoint, IPEndPoint clientEndPoint, UdpClient newSocket, SynchronizationContext uiThread)
+        public ClientRequestParser(BlockingCollection<string> requestQueue, IPEndPoint serverEndPoint, IPEndPoint clientEndPoint, UdpClient newSocket, SynchronizationContext uiThread, ref Barrier sync)
         {
             this.serverEndPoint = serverEndPoint;
             this.clientEndPoint = clientEndPoint;
             this.newSocket = newSocket;
             this.uiThread = uiThread;
             this.requestQueue = requestQueue;
+            this.sync = sync;
         }
 
         public void setUIElements(TextBlock label_messages, TextBlock label_ipAddress)
@@ -47,11 +49,17 @@ namespace GyroMouseServer_ClientRequestHandler
 
         public void parseRequests()
         {
-            JToken X=null;
+
+            Console.WriteLine("I may be blocked");
+            sync.SignalAndWait();
+           
+            JToken X =null;
             JToken Y=null;
             string header=null, param=null;
             while (true)
             {
+                Console.WriteLine("I'm in while!!");
+
                 receivedByte = newSocket.Receive(ref this.clientEndPoint);
 
                 // received data

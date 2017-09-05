@@ -29,6 +29,8 @@ namespace GyroMouseServer
 
         private BlockingCollection<string> blockingCollections;
 
+        private Barrier sync;
+
         ToastNotification toast;
 
         ThreadStart waitingOnClientThreadStart;
@@ -41,6 +43,8 @@ namespace GyroMouseServer
 
             if (GyroMouseServer.Properties.Settings.Default.startMin)
                 this.WindowState = WindowState.Minimized;
+
+            
 
             this.notify = new NotifyIcon
             {
@@ -106,23 +110,24 @@ namespace GyroMouseServer
 
             clientEndpoint = new IPEndPoint(IPAddress.Any, 0);
 
+            Barrier sync = new Barrier(2);
 
-            waitingOnClientThread = new Thread(() => waitingOnClient(blockingCollections, serverEndPoint, clientEndpoint, listeningPort, UIThread));
+            waitingOnClientThread = new Thread(() => waitingOnClient(blockingCollections, serverEndPoint, clientEndpoint, listeningPort, UIThread, ref sync));
+            waitingOnClientThread.Name = "sss";
             waitingOnClientThread.Start();
 
-            ClientRequestParser clientRequestHandler = new ClientRequestParser(blockingCollections, serverEndPoint, clientEndpoint, listeningPort, UIThread);
+            ClientRequestParser clientRequestHandler = new ClientRequestParser(blockingCollections, serverEndPoint, clientEndpoint, listeningPort, UIThread, ref sync);
             clientRequestHandler.setUIElements(textBlock_notifications, textBlock_ip);
 
-//            clientRequestHandleThreadStart = new ThreadStart(clientRequestHandler.parseRequests);
-//            clientRequestHandleThread = new Thread(clientRequestHandleThreadStart);
-//            clientRequestHandleThread.Start();
+            clientRequestHandleThreadStart = new ThreadStart(clientRequestHandler.parseRequests);
+            clientRequestHandleThread = new Thread(clientRequestHandleThreadStart);
+            clientRequestHandleThread.Name = "clientRequestHandleThread";
+            clientRequestHandleThread.Start();
 
             button_startServer.IsEnabled = false;
             button_stopServer.IsEnabled = true;
 
             Toast.generateToastInfo(5000, "Server Started", LocalHost.getLocalHost() + " : " + serverEndPoint.ToString().Substring(serverEndPoint.ToString().LastIndexOf(':') + 1));
-
-            
 
         }
         
@@ -184,7 +189,7 @@ namespace GyroMouseServer
             // Environment.Exit(0);
         }
 
-        private void waitingOnClient(BlockingCollection<string> blockingCollection,IPEndPoint server, IPEndPoint client,UdpClient port,SynchronizationContext UIThread)
+        private void waitingOnClient(BlockingCollection<string> blockingCollection,IPEndPoint server, IPEndPoint client,UdpClient port,SynchronizationContext UIThread,ref Barrier sync)
         {
             Label:
             Byte[] data = listeningPort.Receive(ref client);
@@ -200,6 +205,8 @@ namespace GyroMouseServer
             {
                 data = Encoding.ASCII.GetBytes(welcome);
                 listeningPort.Send(data, data.Length, client);
+                sync.SignalAndWait();
+                Console.WriteLine("FUCK YEAH IM FREE");
             }
             else
                 goto Label;
