@@ -17,158 +17,192 @@ namespace GyroMouseServer
 {
     public partial class MainWindow : Window
     {
+        // UDP variables --
         private IPEndPoint serverEndPoint;
-        private UdpClient listeningPort;
         private IPEndPoint clientEndpoint;
-        private SynchronizationContext UIThread;
+        private UdpClient listeningPort;
 
+        // TCP variables --
+        private IPAddress localAddr = IPAddress.Parse(LocalHost.getLocalHost());
+        private TcpListener serverer=null;
+        private Int32 tcpPort;
+
+
+        // Thread variables
+        private SynchronizationContext UIThread;
         private ThreadStart clientRequestHandleThreadStart;
         private Thread clientRequestHandleThread;
-
-        private NotifyIcon notify;
-
-        private BlockingCollection<string> blockingCollections;
-
+        
+        private ThreadStart waitingOnClientThreadStart;
+        private Thread waitingOnClientThread;
         private Barrier sync;
 
-        ToastNotification toast;
+        // Notification managers
+        private NotifyIcon notify;
+        private ToastNotification toast;
 
-        ThreadStart waitingOnClientThreadStart;
-        Thread waitingOnClientThread;
+        // Other variables
+        private BlockingCollection<string> blockingCollections;
 
         public MainWindow()
         {
             InitializeComponent();
+
+            // initialize sync context
             UIThread = SynchronizationContext.Current;
 
+            // check if needs to start minimized
             if (GyroMouseServer.Properties.Settings.Default.startMin)
                 this.WindowState = WindowState.Minimized;
 
-            
+            // setup system tray
+            sysTraySetup();
 
+            // autostart server if necessary
+            if (GyroMouseServer.Properties.Settings.Default.autoServe)
+                button_startServer_Click(null, null);
+
+
+            //XmlDocument toastXml = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastImageAndText04);
+
+            //// Fill in the text elements
+            //XmlNodeList stringElements = toastXml.GetElementsByTagName("text");
+            //for (int i = 0; i < stringElements.Length; i++)
+            //{
+            //    stringElements[i].AppendChild(toastXml.CreateTextNode("Line " + i));
+            //}
+
+            //// Specify the absolute path to an image
+            ////String imagePath = "file:///" + Path.GetFullPath("toastImageAndText.png");
+            ////XmlNodeList imageElements = toastXml.GetElementsByTagName("image");
+
+            //toast = new ToastNotification(toastXml);
+
+            //toast.Activated += ToastActivated;
+            //toast.Dismissed += ToastDismissed;
+            //toast.Failed += ToastFailed;
+        }
+
+        //private void ToastFailed(ToastNotification sender, ToastFailedEventArgs args)
+        //{
+        //    //throw new NotImplementedException();
+        //}
+
+        //private void ToastDismissed(ToastNotification sender, ToastDismissedEventArgs args)
+        //{
+        //    //throw new NotImplementedException();
+        //}
+
+        //private void ToastActivated(ToastNotification sender, object args)
+        //{
+        //    //throw new NotImplementedException();
+        //}
+
+        void sysTraySetup()
+        {
             this.notify = new NotifyIcon
             {
                 Text = "Gyro Mouse Server",
                 Icon = SystemIcons.Information,
                 Visible = true,
                 ContextMenu = new ContextMenu(new MenuItem[]
-                {   
+                {
                     new MenuItem("Open Window", (s, e) => this.WindowState=WindowState.Normal),
                     new MenuItem("Close Window", (s, e) => this.WindowState=WindowState.Minimized),
                     new MenuItem("-"),
                     new MenuItem("Exit", (s, e) => this.Close())
                 })
             };
-
-            if (GyroMouseServer.Properties.Settings.Default.autoServe)
-                button_startServer_Click(null, null);
-
-            XmlDocument toastXml = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastImageAndText04);
-
-            // Fill in the text elements
-            XmlNodeList stringElements = toastXml.GetElementsByTagName("text");
-            for (int i = 0; i < stringElements.Length; i++)
-            {
-                stringElements[i].AppendChild(toastXml.CreateTextNode("Line " + i));
-            }
-
-            // Specify the absolute path to an image
-            //String imagePath = "file:///" + Path.GetFullPath("toastImageAndText.png");
-            //XmlNodeList imageElements = toastXml.GetElementsByTagName("image");
-
-            toast = new ToastNotification(toastXml);
-
-            toast.Activated += ToastActivated;
-            toast.Dismissed += ToastDismissed;
-            toast.Failed += ToastFailed;
-        }
-
-        private void ToastFailed(ToastNotification sender, ToastFailedEventArgs args)
-        {
-            //throw new NotImplementedException();
-        }
-
-        private void ToastDismissed(ToastNotification sender, ToastDismissedEventArgs args)
-        {
-            //throw new NotImplementedException();
-        }
-
-        private void ToastActivated(ToastNotification sender, object args)
-        {
-            //throw new NotImplementedException();
         }
 
         private void button_startServer_Click(object sender, RoutedEventArgs e)
         {
+            // initialise serverside endpoint
             serverEndPoint = new IPEndPoint(IPAddress.Any, Int32.Parse(GyroMouseServer.Properties.Settings.Default.preferredPort));
-            listeningPort = new UdpClient(serverEndPoint);
 
+            // start listening
+            listeningPort = new UdpClient(serverEndPoint);
+            
+
+            // update UI elements
             textBlock_ip.Text = LocalHost.getLocalHost();
             textBlock_port.Text = serverEndPoint.ToString().Substring(serverEndPoint.ToString().LastIndexOf(':') + 1);
             textBlock_notifications.Text = "Waiting for a client...";
             
-
+            // setup client endpoint to accept any incoming address
             clientEndpoint = new IPEndPoint(IPAddress.Any, 0);
 
-            Barrier sync = new Barrier(2);
+            // initialise a barrier
+            sync = new Barrier(2);
 
-            waitingOnClientThread = new Thread(() => waitingOnClient(blockingCollections, serverEndPoint, clientEndpoint, listeningPort, UIThread, ref sync));
-            waitingOnClientThread.Name = "sss";
+            // wait for client on a separate thread
+            waitingOnClientThread = new Thread(() => waitingOnClient(blockingCollections, serverEndPoint, clientEndpoint, listeningPort, UIThread, ref sync, UIThread));
             waitingOnClientThread.Start();
 
+            // start the thread which handles client requests. The request parser thread waits till a client is available
             ClientRequestParser clientRequestHandler = new ClientRequestParser(blockingCollections, serverEndPoint, clientEndpoint, listeningPort, UIThread, ref sync);
             clientRequestHandler.setUIElements(textBlock_notifications, textBlock_ip);
-
             clientRequestHandleThreadStart = new ThreadStart(clientRequestHandler.parseRequests);
             clientRequestHandleThread = new Thread(clientRequestHandleThreadStart);
             clientRequestHandleThread.Name = "clientRequestHandleThread";
             clientRequestHandleThread.Start();
 
+            // toggle UI elements
             button_startServer.IsEnabled = false;
             button_stopServer.IsEnabled = true;
 
+            // generate a toast
             Toast.generateToastInfo(5000, "Server Started", LocalHost.getLocalHost() + " : " + serverEndPoint.ToString().Substring(serverEndPoint.ToString().LastIndexOf(':') + 1));
-
         }
         
 
-        private void button_stopServer_Click_1(object sender, RoutedEventArgs e)
+        private void button_stopServer_Click(object sender, RoutedEventArgs e)
         {
-            if(clientRequestHandleThread!=null && clientRequestHandleThread.IsAlive)
+            // if client handler thread is running stop it
+            if (clientRequestHandleThread!=null && clientRequestHandleThread.IsAlive)
                 clientRequestHandleThread.Abort();
-            listeningPort.Close();
-            
-            UIThread.Send((object state) =>
-            {
-                textBlock_notifications.Text = "Server Stopped";
-                textBlock_ip.Text = "";
-                textBlock_port.Text = "";
-            }, null);
 
+            if (waitingOnClientThread != null && waitingOnClientThread.IsAlive)
+                waitingOnClientThread.Abort();
+
+            // close the port
+            if(listeningPort!=null)
+                listeningPort.Close();
+
+            if (serverer!=null)
+                serverer.Stop();
+
+            // update UI elements
+            textBlock_notifications.Text = "Server Stopped";
+            textBlock_ip.Text = "";
+            textBlock_port.Text = "";
+            
+            // toggle buttons
             button_startServer.IsEnabled = true;
             button_stopServer.IsEnabled = false;
         }
 
         private void button_settings_Click(object sender, RoutedEventArgs e)
         {
+            // open settings window
             PreferencesWindow prefWin = new PreferencesWindow();
             prefWin.Show();
         }
 
         private void button_about_Click(object sender, RoutedEventArgs e)
         {
+            //generic button
+            
             //this.WindowState = System.Windows.WindowState.Minimized;
             //Toast.generateToastInfo(3000, "Hi", "This is a BallonTip from Windows Notification");
 
             ToastNotificationManager.CreateToastNotifier("GyroMouseServer").Show(toast);
-           
-
-
         }
 
         private void Window_StateChanged(object sender, EventArgs e)
         {
-            if(this.WindowState.Equals(System.Windows.WindowState.Minimized) && GyroMouseServer.Properties.Settings.Default.minTray)
+            // minimise to tray
+            if (this.WindowState.Equals(System.Windows.WindowState.Minimized) && GyroMouseServer.Properties.Settings.Default.minTray)
             {
                 this.ShowInTaskbar = false;
                 Toast.generateToastInfo(3000, "Hi", "Gyro Mouse Server is running in the system tray");
@@ -177,40 +211,93 @@ namespace GyroMouseServer
 
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
+            // dispose tray icon
             if (this.notify != null)
             {
                 this.notify.Dispose();
             }
 
-            button_stopServer_Click_1(null,null);
+            //shutdown server
+            button_stopServer_Click(null,null);
+            
             // Shutdown the application.
             System.Windows.Application.Current.Shutdown();
-            // OR You can Also go for below logic
-            // Environment.Exit(0);
         }
 
-        private void waitingOnClient(BlockingCollection<string> blockingCollection,IPEndPoint server, IPEndPoint client,UdpClient port,SynchronizationContext UIThread,ref Barrier sync)
+        // wait for broadcast receiving or client to connect
+        private void waitingOnClient(BlockingCollection<string> blockingCollection,IPEndPoint server, IPEndPoint client,UdpClient port, SynchronizationContext UIThread,ref Barrier sync,SynchronizationContext uiThread)
         {
             Label:
             Byte[] data = listeningPort.Receive(ref client);
             Console.WriteLine("Message received from {0}:", client.ToString());
             Console.WriteLine(Encoding.ASCII.GetString(data, 0, data.Length));
+            
 
             Console.WriteLine("Message received from {0}:", client.ToString());
             Console.WriteLine(Encoding.ASCII.GetString(data, 0, data.Length));
 
+            string[] requstIP = client.ToString().Split(':');
+            Console.WriteLine("requestIP>> "+requstIP[0]);
+
             string welcome = LocalHost.getLocalHost();
 
-            if (Encoding.ASCII.GetString(data, 0, data.Length) == "DICK MOVE")
+            if (Encoding.ASCII.GetString(data, 0, data.Length) == "CANCONNECT")
             {
-                data = Encoding.ASCII.GetBytes(welcome);
-                listeningPort.Send(data, data.Length, client);
-                sync.SignalAndWait();
-                Console.WriteLine("FUCK YEAH IM FREE");
+                initilaiseTCP();
+                // wait for tcp connection
+                serverer.Start();
+
+                // accept tcp connection
+                Socket soc = serverer.AcceptSocket();
+                
+
+                Console.WriteLine("Client Socket Address>> "+ soc.RemoteEndPoint);
+
+                //extractIP
+                string clientSock = soc.RemoteEndPoint.ToString();
+                string[] clientIP = clientSock.Split(':');
+
+
+                Console.WriteLine("Client IP Address>> " + clientIP[0]);
+
+                
+
+                
+
+                if (requstIP[0] == clientIP[0])
+                {
+                    TcpClient tcpclient = new TcpClient();
+                    tcpclient.Client = soc;
+
+                    NetworkStream stream = new NetworkStream(soc);
+
+                    byte[] msg = System.Text.Encoding.ASCII.GetBytes("COMEATMEBRUH!=random");
+                    stream.Write(msg, 0, msg.Length);
+                    Console.WriteLine("Sent: {0}", data);
+                    
+                    uiThread.Send((object state) =>
+                    {
+                        textBlock_notifications.Text = "Connected to client!";
+                    }, null);
+                    sync.SignalAndWait();
+                    Console.WriteLine("FUCK YEAH IM FREE");
+                }
+                else
+                {
+                    goto Label;
+                }
             }
             else
                 goto Label;
                 
         }
+
+        void initilaiseTCP()
+        {
+            tcpPort = 13000;
+            IPAddress localAddr = IPAddress.Parse(LocalHost.getLocalHost());
+            serverer = new TcpListener(localAddr, tcpPort);
+        }
+        
     }
 }

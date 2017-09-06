@@ -61,7 +61,7 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Button x:Name="button_startServer" Grid.Column="0" Content="Start Server" Margin="5" Click="button_startServer_Click"/>
-                <Button x:Name="button_stopServer" Content="Stop Server" Grid.Column="1" Margin="5" Click="button_stopServer_Click_1" IsEnabled="False"/>
+                <Button x:Name="button_stopServer" Content="Stop Server" Grid.Column="1" Margin="5" Click="button_stopServer_Click" IsEnabled="False"/>
             </Grid>
         </Border>
 

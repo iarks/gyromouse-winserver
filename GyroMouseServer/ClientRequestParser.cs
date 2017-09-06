@@ -63,8 +63,6 @@ namespace GyroMouseServer_ClientRequestHandler
 
                 receivedByte = newSocket.Receive(ref this.clientEndPoint);
 
-                // received data
-                receivedCommand = Encoding.UTF8.GetString(receivedByte, 0, receivedByte.Length);
 
                 
 
@@ -154,6 +152,19 @@ namespace GyroMouseServer_ClientRequestHandler
                         case "AU":
                             WinkeyInput.KeyDown(Keys.Up);
                             WinkeyInput.KeyUp(Keys.Up);
+                            break;
+                        case "CONNECTION_REQIEST":
+                            //byte[] msg = Encoding.ASCII.GetBytes("UDEREBRUH");
+                            //stream.Write(msg, 0, msg.Length);
+                            //stream.Read(bytes, 0, bytes.Length))
+                            //if(i= stream.Read(bytes, 0, bytes.Length))!=0)
+                            //{
+                            //    string data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
+                            //    if (data = "HEREBRUH")
+                            //    {
+                            //        //ALREADY CONNECTED
+                            //    }
+                            //}
                             break;
                         default:
                             dxf = float.Parse(header);
