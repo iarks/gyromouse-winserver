@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using Microsoft.Win32;
 
 namespace GyroMouseServer
@@ -34,6 +35,9 @@ namespace GyroMouseServer
             slider_acceleration.Value = GyroMouseServer.Properties.Settings.Default.acceleration;
             
             textBox_preferredPort.Text = GyroMouseServer.Properties.Settings.Default.preferredPort;    
+
+            textBlock_sensitivity.Text = GyroMouseServer.Properties.Settings.Default.sensitivity.ToString();
+            textBlock_acceleration.Text = GyroMouseServer.Properties.Settings.Default.acceleration.ToString();
         }
         
         void savePrefs()
@@ -98,5 +102,14 @@ namespace GyroMouseServer
 
         }
 
+        private void slider_sensitivity_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            
+        }
+
+        private void slider_acceleration_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            
+        }
     }
 }

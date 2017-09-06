@@ -241,8 +241,13 @@ namespace GyroMouseServer
 
             string welcome = LocalHost.getLocalHost();
 
+            
+
             if (Encoding.ASCII.GetString(data, 0, data.Length) == "CANCONNECT")
             {
+                data = Encoding.ASCII.GetBytes(welcome);
+                listeningPort.Send(data, data.Length, client);
+
                 initilaiseTCP();
                 // wait for tcp connection
                 serverer.Start();
@@ -271,7 +276,7 @@ namespace GyroMouseServer
 
                     NetworkStream stream = new NetworkStream(soc);
 
-                    byte[] msg = System.Text.Encoding.ASCII.GetBytes("COMEATMEBRUH!=random");
+                    byte[] msg = System.Text.Encoding.ASCII.GetBytes("COMEATMEBRUH!=random\n");
                     stream.Write(msg, 0, msg.Length);
                     Console.WriteLine("Sent: {0}", data);
                     
@@ -279,6 +284,7 @@ namespace GyroMouseServer
                     {
                         textBlock_notifications.Text = "Connected to client!";
                     }, null);
+
                     sync.SignalAndWait();
                     Console.WriteLine("FUCK YEAH IM FREE");
                 }

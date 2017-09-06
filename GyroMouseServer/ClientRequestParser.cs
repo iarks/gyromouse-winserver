@@ -63,8 +63,9 @@ namespace GyroMouseServer_ClientRequestHandler
 
                 receivedByte = newSocket.Receive(ref this.clientEndPoint);
 
+                // received data
+                receivedCommand = Encoding.UTF8.GetString(receivedByte, 0, receivedByte.Length);
 
-                
 
                 try
                 {
@@ -171,7 +172,7 @@ namespace GyroMouseServer_ClientRequestHandler
                             dyf = float.Parse(param);
                             if (!firstVal)
                             {
-                                mouse.movePointer(dxf * 25, dyf * 25);
+                                mouse.movePointer(dxf * GyroMouseServer.Properties.Settings.Default.sensitivity, dyf * GyroMouseServer.Properties.Settings.Default.sensitivity);
                             }
                             else
                             {
