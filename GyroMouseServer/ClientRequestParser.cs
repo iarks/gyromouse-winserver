@@ -1,5 +1,4 @@
-﻿using System.Linq.Expressions;
-using System;
+﻿using System;
 using System.Text;
 using System.Net;
 using System.Net.Sockets;
@@ -26,6 +25,13 @@ namespace GyroMouseServer_ClientRequestHandler
         private float dxf, dyf;
         private Barrier sync;
 
+        JToken headerJT = null;
+        JToken paramJT = null;
+        JToken sessKeyJT = null;
+
+        string ssKey = null;
+        string header = null, param = null;
+
         private KeyboardInput kbi = new KeyboardInput();
 
         private Mouse mouse = new Mouse();
@@ -50,39 +56,35 @@ namespace GyroMouseServer_ClientRequestHandler
 
         public void parseRequests()
         {
+            ssKey = null;
+            header = null;
+            param = null;
 
-            Console.WriteLine("I may be blocked");
-            sync.SignalAndWait();
-           
-            JToken X =null;
-            JToken Y=null;
-            string header=null, param=null;
             while (true)
             {
                 Console.WriteLine("I'm in while!!");
 
+                // received byte
                 receivedByte = newSocket.Receive(ref this.clientEndPoint);
 
-                // received data
+                // convert byte to string
                 receivedCommand = Encoding.UTF8.GetString(receivedByte, 0, receivedByte.Length);
-
+                Console.WriteLine(receivedCommand);
 
                 try
                 {
-                    // converting it to json
+                    // converting string to json
                     JObject json = JObject.Parse(receivedCommand);
 
                     //extracting that data
+                    json.TryGetValue("X", out headerJT);
+                    json.TryGetValue("Y", out paramJT);
+                    json.TryGetValue("Z", out sessKeyJT);
+
+                    header = headerJT.ToString();
+                    param = paramJT.ToString();
+                    ssKey = sessKeyJT.ToString();
                     
-
-                    json.TryGetValue("X", out X);
-                    json.TryGetValue("Y", out Y);
-
-                    header = X.ToString();
-                    param = Y.ToString();
-
-                    
-
                 }
                 catch (Exception e)
                 {
@@ -95,98 +97,83 @@ namespace GyroMouseServer_ClientRequestHandler
                 //    label_ipAddress.Text = Y.ToString() + ":" + X.ToString();
                 //}, null);
 
-                try
+                if (ssKey == Client.ssKey)
                 {
-
-                    switch (header)
+                    try
                     {
-                        case "EOT":
-                            firstVal = true;
-                            break;
-                        case "LD":
-                            mouse.leftDown();
-                            break;
-                        case "LU":
-                            mouse.leftUp();
-                            break;
-                        case "S":
-                            dyf = float.Parse(param);
-                            mouse.scroll(dyf);
-                            break;
-                        case "RD":
-                            mouse.rightDown();
-                            break;
-                        case "RU":
-                            mouse.rightUp();
-                            break;
-                        case "BS":
-                            WinkeyInput.KeyDown(Keys.Back);
-                            WinkeyInput.KeyUp(Keys.Back);
-                            break;
-                        case "EN":
-                            WinkeyInput.KeyDown(Keys.Enter);
-                            WinkeyInput.KeyUp(Keys.Enter);
-                            break;
-                        case "U":
-                            kbi.typeIn(param);
-                            break;
-                        case "ESC":
-                            WinkeyInput.KeyDown(Keys.Escape);
-                            WinkeyInput.KeyUp(Keys.Escape);
-                            break;
-                        case "WIN":
-                            WinkeyInput.KeyDown(Keys.LWin);
-                            WinkeyInput.KeyUp(Keys.LWin);
-                            break;
-                        case "AL":
-                            WinkeyInput.KeyDown(Keys.Right);
-                            WinkeyInput.KeyUp(Keys.Right);
-                            break;
-                        case "AR":
-                            WinkeyInput.KeyDown(Keys.Left);
-                            WinkeyInput.KeyUp(Keys.Left);
-                            break;
-                        case "AD":
-                            WinkeyInput.KeyDown(Keys.Down);
-                            WinkeyInput.KeyUp(Keys.Down);
-                            break;
-                        case "AU":
-                            WinkeyInput.KeyDown(Keys.Up);
-                            WinkeyInput.KeyUp(Keys.Up);
-                            break;
-                        case "CONNECTION_REQIEST":
-                            //byte[] msg = Encoding.ASCII.GetBytes("UDEREBRUH");
-                            //stream.Write(msg, 0, msg.Length);
-                            //stream.Read(bytes, 0, bytes.Length))
-                            //if(i= stream.Read(bytes, 0, bytes.Length))!=0)
-                            //{
-                            //    string data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
-                            //    if (data = "HEREBRUH")
-                            //    {
-                            //        //ALREADY CONNECTED
-                            //    }
-                            //}
-                            break;
-                        default:
-                            dxf = float.Parse(header);
-                            dyf = float.Parse(param);
-                            if (!firstVal)
-                            {
-                                mouse.movePointer(dxf * GyroMouseServer.Properties.Settings.Default.sensitivity, dyf * GyroMouseServer.Properties.Settings.Default.sensitivity);
-                            }
-                            else
-                            {
-                                firstVal = false;
-                            }
-                            break;
-
+                        switch (header)
+                        {
+                            case "{\"X\":\"CANHAVEIP?\",\"Y\":\"0\"}":
+                                break;
+                            case "EOT":
+                                firstVal = true;
+                                break;
+                            case "LD":
+                                mouse.leftDown();
+                                break;
+                            case "LU":
+                                mouse.leftUp();
+                                break;
+                            case "S":
+                                dyf = float.Parse(param);
+                                mouse.scroll(dyf);
+                                break;
+                            case "RD":
+                                mouse.rightDown();
+                                break;
+                            case "RU":
+                                mouse.rightUp();
+                                break;
+                            case "BS":
+                                WinkeyInput.KeyDown(Keys.Back);
+                                WinkeyInput.KeyUp(Keys.Back);
+                                break;
+                            case "EN":
+                                WinkeyInput.KeyDown(Keys.Enter);
+                                WinkeyInput.KeyUp(Keys.Enter);
+                                break;
+                            case "U":
+                                kbi.typeIn(param);
+                                break;
+                            case "ESC":
+                                WinkeyInput.KeyDown(Keys.Escape);
+                                WinkeyInput.KeyUp(Keys.Escape);
+                                break;
+                            case "WIN":
+                                WinkeyInput.KeyDown(Keys.LWin);
+                                WinkeyInput.KeyUp(Keys.LWin);
+                                break;
+                            case "AL":
+                                WinkeyInput.KeyDown(Keys.Right);
+                                WinkeyInput.KeyUp(Keys.Right);
+                                break;
+                            case "AR":
+                                WinkeyInput.KeyDown(Keys.Left);
+                                WinkeyInput.KeyUp(Keys.Left);
+                                break;
+                            case "AD":
+                                WinkeyInput.KeyDown(Keys.Down);
+                                WinkeyInput.KeyUp(Keys.Down);
+                                break;
+                            case "AU":
+                                WinkeyInput.KeyDown(Keys.Up);
+                                WinkeyInput.KeyUp(Keys.Up);
+                                break;
+                            default:
+                                dxf = float.Parse(header);
+                                dyf = float.Parse(param);
+                                if (!firstVal)
+                                    mouse.movePointer(dxf * GyroMouseServer.Properties.Settings.Default.sensitivity, dyf * GyroMouseServer.Properties.Settings.Default.sensitivity);
+                                else
+                                    firstVal = false;
+                                break;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.Write(header + "," + param);
                     }
                 }
-                catch (Exception e)
-                {
-                    Console.Write(header + "," + param);
-                }
-
                 //sending a message back to client
                 //string connectionInitiateMessage = "Connected To " + System.Environment.MachineName;
                 //data = Encoding.ASCII.GetBytes(connectionInitiateMessage);

@@ -1,5 +1,4 @@
-﻿using System.Windows.Forms.VisualStyles;
-using System.Drawing;
+﻿using System.Drawing;
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -10,7 +9,6 @@ using GyroMouseServer_ClientRequestHandler;
 using System.Collections.Concurrent;
 using System.Windows.Forms;
 using Windows.UI.Notifications;
-using Windows.Data.Xml.Dom;
 using System.Text;
 
 namespace GyroMouseServer
@@ -23,16 +21,18 @@ namespace GyroMouseServer
         private UdpClient listeningPort;
 
         // TCP variables --
-        private IPAddress localAddr = IPAddress.Parse(LocalHost.getLocalHost());
-        private TcpListener serverer=null;
-        private Int32 tcpPort;
+        private IPAddress serverIPAddr = IPAddress.Parse(LocalHost.getLocalHost());
+        private TcpListener tcpServer = null;
+        private Int32 tcpPort=13000;
 
 
         // Thread variables
         private SynchronizationContext UIThread;
         private ThreadStart clientRequestHandleThreadStart;
         private Thread clientRequestHandleThread;
-        
+        private Thread TCPConnectionHandlerThread;
+        private TCPConnectionHandler tCPConnectionHandler;
+
         private ThreadStart waitingOnClientThreadStart;
         private Thread waitingOnClientThread;
         private Barrier sync;
@@ -122,13 +122,13 @@ namespace GyroMouseServer
 
             // start listening
             listeningPort = new UdpClient(serverEndPoint);
-            
+
 
             // update UI elements
             textBlock_ip.Text = LocalHost.getLocalHost();
             textBlock_port.Text = serverEndPoint.ToString().Substring(serverEndPoint.ToString().LastIndexOf(':') + 1);
             textBlock_notifications.Text = "Waiting for a client...";
-            
+
             // setup client endpoint to accept any incoming address
             clientEndpoint = new IPEndPoint(IPAddress.Any, 0);
 
@@ -147,6 +147,12 @@ namespace GyroMouseServer
             clientRequestHandleThread.Name = "clientRequestHandleThread";
             clientRequestHandleThread.Start();
 
+            // start the tcpConnectionHandler Thread
+            tCPConnectionHandler = new TCPConnectionHandler(serverIPAddr, tcpServer, tcpPort);
+            ThreadStart ts = new ThreadStart(tCPConnectionHandler.run);
+            TCPConnectionHandlerThread = new Thread(ts);
+            TCPConnectionHandlerThread.Start();
+
             // toggle UI elements
             button_startServer.IsEnabled = false;
             button_stopServer.IsEnabled = true;
@@ -154,29 +160,41 @@ namespace GyroMouseServer
             // generate a toast
             Toast.generateToastInfo(5000, "Server Started", LocalHost.getLocalHost() + " : " + serverEndPoint.ToString().Substring(serverEndPoint.ToString().LastIndexOf(':') + 1));
         }
-        
+
 
         private void button_stopServer_Click(object sender, RoutedEventArgs e)
         {
             // if client handler thread is running stop it
-            if (clientRequestHandleThread!=null && clientRequestHandleThread.IsAlive)
+            if (clientRequestHandleThread.IsAlive && clientRequestHandleThread != null)
                 clientRequestHandleThread.Abort();
 
-            if (waitingOnClientThread != null && waitingOnClientThread.IsAlive)
+            if (waitingOnClientThread.IsAlive && waitingOnClientThread != null)
                 waitingOnClientThread.Abort();
 
+            //stop the client handler thread
+            if (TCPConnectionHandlerThread.IsAlive && TCPConnectionHandlerThread != null)
+            {
+                //tCPConnectionHandler.getSyncContext().Send((object state) =>
+                //{
+                //    tCPConnectionHandler.stop();
+                //}, null);
+                TCPConnectionHandlerThread.Abort();
+
+            }
+                
+
             // close the port
-            if(listeningPort!=null)
+            if (listeningPort != null)
                 listeningPort.Close();
 
-            if (serverer!=null)
-                serverer.Stop();
+            if (tcpServer != null)
+                tcpServer.Stop();
 
             // update UI elements
             textBlock_notifications.Text = "Server Stopped";
             textBlock_ip.Text = "";
             textBlock_port.Text = "";
-            
+
             // toggle buttons
             button_startServer.IsEnabled = true;
             button_stopServer.IsEnabled = false;
@@ -192,7 +210,7 @@ namespace GyroMouseServer
         private void button_about_Click(object sender, RoutedEventArgs e)
         {
             //generic button
-            
+
             //this.WindowState = System.Windows.WindowState.Minimized;
             //Toast.generateToastInfo(3000, "Hi", "This is a BallonTip from Windows Notification");
 
@@ -206,7 +224,7 @@ namespace GyroMouseServer
             {
                 this.ShowInTaskbar = false;
                 Toast.generateToastInfo(3000, "Hi", "Gyro Mouse Server is running in the system tray");
-            }   
+            }
         }
 
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
@@ -218,92 +236,34 @@ namespace GyroMouseServer
             }
 
             //shutdown server
-            button_stopServer_Click(null,null);
-            
+            button_stopServer_Click(null, null);
+
             // Shutdown the application.
             System.Windows.Application.Current.Shutdown();
         }
 
         // wait for broadcast receiving or client to connect
-        private void waitingOnClient(BlockingCollection<string> blockingCollection,IPEndPoint server, IPEndPoint client,UdpClient port, SynchronizationContext UIThread,ref Barrier sync,SynchronizationContext uiThread)
+        private void waitingOnClient(BlockingCollection<string> blockingCollection, IPEndPoint server, IPEndPoint client, UdpClient port, SynchronizationContext UIThread, ref Barrier sync, SynchronizationContext uiThread)
         {
-            Label:
-            Byte[] data = listeningPort.Receive(ref client);
-            Console.WriteLine("Message received from {0}:", client.ToString());
-            Console.WriteLine(Encoding.ASCII.GetString(data, 0, data.Length));
-            
+            Byte[] receivedData;
+            Byte[] responseData = Encoding.ASCII.GetBytes(LocalHost.getLocalHost());
 
-            Console.WriteLine("Message received from {0}:", client.ToString());
-            Console.WriteLine(Encoding.ASCII.GetString(data, 0, data.Length));
-
-            string[] requstIP = client.ToString().Split(':');
-            Console.WriteLine("requestIP>> "+requstIP[0]);
-
-            string welcome = LocalHost.getLocalHost();
-
-            
-
-            if (Encoding.ASCII.GetString(data, 0, data.Length) == "CANCONNECT")
+            while (Client.isConnected==false)
             {
-                data = Encoding.ASCII.GetBytes(welcome);
-                listeningPort.Send(data, data.Length, client);
+                receivedData = listeningPort.Receive(ref client);
+                Console.WriteLine("Message received from {0}:", client.ToString());
+                Console.WriteLine(Encoding.ASCII.GetString(receivedData, 0, receivedData.Length));
 
-                initilaiseTCP();
-                // wait for tcp connection
-                serverer.Start();
-
-                // accept tcp connection
-                Socket soc = serverer.AcceptSocket();
-                
-
-                Console.WriteLine("Client Socket Address>> "+ soc.RemoteEndPoint);
-
-                //extractIP
-                string clientSock = soc.RemoteEndPoint.ToString();
-                string[] clientIP = clientSock.Split(':');
-
-
-                Console.WriteLine("Client IP Address>> " + clientIP[0]);
-
-                
-
-                
-
-                if (requstIP[0] == clientIP[0])
+                if (Encoding.ASCII.GetString(receivedData, 0, receivedData.Length) == "{\"X\":\"CANHAVEIP?\",\"Y\":\"0\"}")
                 {
-                    TcpClient tcpclient = new TcpClient();
-                    tcpclient.Client = soc;
+                    string[] requstIP = client.ToString().Split(':');
+                    Console.WriteLine("ClientIP>> " + requstIP[0]);
 
-                    NetworkStream stream = new NetworkStream(soc);
 
-                    byte[] msg = System.Text.Encoding.ASCII.GetBytes("COMEATMEBRUH!=random\n");
-                    stream.Write(msg, 0, msg.Length);
-                    Console.WriteLine("Sent: {0}", data);
-                    
-                    uiThread.Send((object state) =>
-                    {
-                        textBlock_notifications.Text = "Connected to client!";
-                    }, null);
-
-                    sync.SignalAndWait();
-                    Console.WriteLine("FUCK YEAH IM FREE");
-                }
-                else
-                {
-                    goto Label;
+                    listeningPort.Send(responseData, responseData.Length, client);
                 }
             }
-            else
-                goto Label;
-                
+            Console.WriteLine("CLIENT HAS CONNECTED. MY JOB IS DONE!");
         }
-
-        void initilaiseTCP()
-        {
-            tcpPort = 13000;
-            IPAddress localAddr = IPAddress.Parse(LocalHost.getLocalHost());
-            serverer = new TcpListener(localAddr, tcpPort);
-        }
-        
     }
 }
