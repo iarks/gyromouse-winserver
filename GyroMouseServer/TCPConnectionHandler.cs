@@ -74,10 +74,18 @@ namespace GyroMouseServer
                             try
                             {
                                 Console.WriteLine("ASKING UDERE?");
-                            NetworkStream str = Client.tcpClient.GetStream();
+                                NetworkStream str = Client.tcpClient.GetStream();
                                 str.Write(msg, 0, msg.Length);
                                 str.Flush();
-                            }
+
+                                while ((i = Client.tcpStream.Read(receivedBytes, 0, receivedBytes.Length)) != 0)
+                                {
+                                    // Translate data bytes to a ASCII string.
+                                    receivedString = System.Text.Encoding.ASCII.GetString(receivedBytes, 0, i);
+                                    Console.WriteLine("Received from new client: {0}", receivedString);
+                                    break;
+                                }
+                        }
                             catch (IOException e)
                             {
                                 // means old stream is redundant and no client is available
@@ -100,6 +108,11 @@ namespace GyroMouseServer
                         //no previous client - so allow new guy to connect
                         connectThisClient(client, stream);
                     }
+                }
+                else
+                {
+                    Console.WriteLine("WE DONT LIKE WHAT THIS GUY SAID. FUCK HIM!");
+                    client.Close();
                 }
             }
             Console.WriteLine("Exited while");

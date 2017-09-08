@@ -9,6 +9,7 @@ using Newtonsoft.Json.Linq;
 using GyroMouseServer_MouseMove;
 using GyroMouseServer;
 using System.Windows.Forms;
+using GyroMouseServer_LocalHost;
 
 namespace GyroMouseServer_ClientRequestHandler
 {
@@ -71,25 +72,7 @@ namespace GyroMouseServer_ClientRequestHandler
                 receivedCommand = Encoding.UTF8.GetString(receivedByte, 0, receivedByte.Length);
                 Console.WriteLine(receivedCommand);
 
-                try
-                {
-                    // converting string to json
-                    JObject json = JObject.Parse(receivedCommand);
-
-                    //extracting that data
-                    json.TryGetValue("X", out headerJT);
-                    json.TryGetValue("Y", out paramJT);
-                    json.TryGetValue("Z", out sessKeyJT);
-
-                    header = headerJT.ToString();
-                    param = paramJT.ToString();
-                    ssKey = sessKeyJT.ToString();
-                    
-                }
-                catch (Exception e)
-                {
-                   
-                }
+                string[] extractedCommand = receivedCommand.Split(';');
 
                 //uiThread.Send((object state) =>
                 //{
@@ -97,13 +80,25 @@ namespace GyroMouseServer_ClientRequestHandler
                 //    label_ipAddress.Text = Y.ToString() + ":" + X.ToString();
                 //}, null);
 
-                if (ssKey == Client.ssKey)
+                if (extractedCommand[2] == Client.ssKey || extractedCommand[0] == "CANHAVEIP?" && extractedCommand[2]=="GMO")
                 {
                     try
                     {
-                        switch (header)
+                        Console.WriteLine(extractedCommand[2]);
+                    }
+                    catch(Exception e)
+                    {
+
+                    }
+                    try
+                    {
+                        switch (extractedCommand[0])
                         {
-                            case "{\"X\":\"CANHAVEIP?\",\"Y\":\"0\"}":
+                            case "CANHAVEIP?":
+                                Byte[] responseData = Encoding.ASCII.GetBytes(LocalHost.getLocalHost());
+                                string[] requstIP = clientEndPoint.ToString().Split(':');
+                                Console.WriteLine("ClientIP>> " + requstIP[0]);
+                                newSocket.Send(responseData, responseData.Length, clientEndPoint);
                                 break;
                             case "EOT":
                                 firstVal = true;
@@ -115,7 +110,7 @@ namespace GyroMouseServer_ClientRequestHandler
                                 mouse.leftUp();
                                 break;
                             case "S":
-                                dyf = float.Parse(param);
+                                dyf = float.Parse(extractedCommand[1]);
                                 mouse.scroll(dyf);
                                 break;
                             case "RD":
@@ -133,7 +128,7 @@ namespace GyroMouseServer_ClientRequestHandler
                                 WinkeyInput.KeyUp(Keys.Enter);
                                 break;
                             case "U":
-                                kbi.typeIn(param);
+                                kbi.typeIn(extractedCommand[1]);
                                 break;
                             case "ESC":
                                 WinkeyInput.KeyDown(Keys.Escape);
@@ -160,8 +155,8 @@ namespace GyroMouseServer_ClientRequestHandler
                                 WinkeyInput.KeyUp(Keys.Up);
                                 break;
                             default:
-                                dxf = float.Parse(header);
-                                dyf = float.Parse(param);
+                                dxf = float.Parse(extractedCommand[0]);
+                                dyf = float.Parse(extractedCommand[1]);
                                 if (!firstVal)
                                     mouse.movePointer(dxf * GyroMouseServer.Properties.Settings.Default.sensitivity, dyf * GyroMouseServer.Properties.Settings.Default.sensitivity);
                                 else
@@ -174,11 +169,13 @@ namespace GyroMouseServer_ClientRequestHandler
                         Console.Write(header + "," + param);
                     }
                 }
-                //sending a message back to client
+                
                 //string connectionInitiateMessage = "Connected To " + System.Environment.MachineName;
                 //data = Encoding.ASCII.GetBytes(connectionInitiateMessage);
                 //listeningPort.Send(data, data.Length, this.remoteIPEndpoint);
             }
         }
+
+        
     }
 }

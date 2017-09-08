@@ -134,10 +134,7 @@ namespace GyroMouseServer
 
             // initialise a barrier
             sync = new Barrier(2);
-
-            // wait for client on a separate thread
-            waitingOnClientThread = new Thread(() => waitingOnClient(blockingCollections, serverEndPoint, clientEndpoint, listeningPort, UIThread, ref sync, UIThread));
-            waitingOnClientThread.Start();
+            
 
             // start the thread which handles client requests. The request parser thread waits till a client is available
             ClientRequestParser clientRequestHandler = new ClientRequestParser(blockingCollections, serverEndPoint, clientEndpoint, listeningPort, UIThread, ref sync);
@@ -241,29 +238,6 @@ namespace GyroMouseServer
             // Shutdown the application.
             System.Windows.Application.Current.Shutdown();
         }
-
-        // wait for broadcast receiving or client to connect
-        private void waitingOnClient(BlockingCollection<string> blockingCollection, IPEndPoint server, IPEndPoint client, UdpClient port, SynchronizationContext UIThread, ref Barrier sync, SynchronizationContext uiThread)
-        {
-            Byte[] receivedData;
-            Byte[] responseData = Encoding.ASCII.GetBytes(LocalHost.getLocalHost());
-
-            while (Client.isConnected==false)
-            {
-                receivedData = listeningPort.Receive(ref client);
-                Console.WriteLine("Message received from {0}:", client.ToString());
-                Console.WriteLine(Encoding.ASCII.GetString(receivedData, 0, receivedData.Length));
-
-                if (Encoding.ASCII.GetString(receivedData, 0, receivedData.Length) == "{\"X\":\"CANHAVEIP?\",\"Y\":\"0\"}")
-                {
-                    string[] requstIP = client.ToString().Split(':');
-                    Console.WriteLine("ClientIP>> " + requstIP[0]);
-
-
-                    listeningPort.Send(responseData, responseData.Length, client);
-                }
-            }
-            Console.WriteLine("CLIENT HAS CONNECTED. MY JOB IS DONE!");
-        }
+        
     }
 }
