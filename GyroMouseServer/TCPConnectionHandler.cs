@@ -17,6 +17,7 @@ namespace GyroMouseServer
         IPAddress tcpserverIP;
         TcpListener tcpServer;
         Int32 tcpPort;
+        TcpClient client;
 
         public TCPConnectionHandler(IPAddress tcpserverIP, TcpListener tcpServer, Int32 tcpPort)
         {
@@ -34,43 +35,45 @@ namespace GyroMouseServer
             tcpServer = new TcpListener(tcpserverIP, tcpPort);
             tcpServer.Start();
 
-            while (true)
+            try
             {
-                Console.WriteLine("Waiting for a connection... ");
-
-                TcpClient client = tcpServer.AcceptTcpClient();
-
-                Console.WriteLine("Connected!");
-
-                NetworkStream stream = client.GetStream();
-
-                int i;
-
-                // Loop to receive all the data sent by the client.
-                while ((i = stream.Read(receivedBytes, 0, receivedBytes.Length)) != 0)
+                while (true)
                 {
-                    // Translate data bytes to a ASCII string.
-                    receivedString = System.Text.Encoding.ASCII.GetString(receivedBytes, 0, i);
-                    Console.WriteLine("Received from new client: {0}", receivedString);
-                    break;
-                }
+                    Console.WriteLine("Waiting for a connection... ");
 
-                Console.WriteLine("Received from new client - printing outside while: {0}", receivedString);
+                    client = tcpServer.AcceptTcpClient();
 
-                if (receivedString == "CANCONNECT?")
-                {
-                    receivedString = "";
-                    connectThisClientFlag = 0;
-                    // check if a previous client is available
-                    Console.WriteLine("CANCONNECT? WAS RECEIVED - NEW CLIENT WANTS TO ESTABLISH CONNECTION AND IS REQUESTING A SESSIONKEY");
-                    if (Client.isConnected)
+                    Console.WriteLine("Connected!");
+
+                    NetworkStream stream = client.GetStream();
+
+                    int i;
+
+                    // Loop to receive all the data sent by the client.
+                    while ((i = stream.Read(receivedBytes, 0, receivedBytes.Length)) != 0)
                     {
-                        Console.WriteLine("BUT A PREVIOUS CLIENT WAS ALREADY AVAILABLE - SO LETS SEE IF THEY CAN STILL CONNECT");
-                        // means there was a previous client
-                        // check if the client is still connected
-                        
-                        byte[] msg = System.Text.Encoding.ASCII.GetBytes("UDERE?");
-                        
+                        // Translate data bytes to a ASCII string.
+                        receivedString = System.Text.Encoding.ASCII.GetString(receivedBytes, 0, i);
+                        Console.WriteLine("Received from new client: {0}", receivedString);
+                        break;
+                    }
+
+                    Console.WriteLine("Received from new client - printing outside while: {0}", receivedString);
+
+                    if (receivedString == "CANCONNECT?")
+                    {
+                        receivedString = "";
+                        connectThisClientFlag = 0;
+                        // check if a previous client is available
+                        Console.WriteLine("CANCONNECT? WAS RECEIVED - NEW CLIENT WANTS TO ESTABLISH CONNECTION AND IS REQUESTING A SESSIONKEY");
+                        if (Client.isConnected)
+                        {
+                            Console.WriteLine("BUT A PREVIOUS CLIENT WAS ALREADY AVAILABLE - SO LETS SEE IF THEY CAN STILL CONNECT");
+                            // means there was a previous client
+                            // check if the client is still connected
+
+                            byte[] msg = System.Text.Encoding.ASCII.GetBytes("UDERE?");
+
                             try
                             {
                                 Console.WriteLine("ASKING UDERE?");
@@ -85,7 +88,15 @@ namespace GyroMouseServer
                                     Console.WriteLine("Received from new client: {0}", receivedString);
                                     break;
                                 }
-                        }
+                                Console.WriteLine("break from while");
+                                Console.WriteLine("WHAT WAS RECEIVED?" + receivedString);
+                                if (receivedString != "YES")
+                                {
+                                    Console.WriteLine("PREVIOUS CLIENT IS UNAVAILABLE");
+                                    connectThisClient(client, stream);
+                                    connectThisClientFlag = 1;
+                                }
+                            }
                             catch (IOException e)
                             {
                                 // means old stream is redundant and no client is available
@@ -93,29 +104,34 @@ namespace GyroMouseServer
                                 connectThisClientFlag = 1;
                                 connectThisClient(client, stream);
                             }
-                        
-                        if(connectThisClientFlag==0)
-                        {
-                            Console.WriteLine("NO EXCEPTION THROWN - THEY ARE PROBABLY AVAILABLE - REJECT THIS CLIENT");
-                            client.Close();
-                           
+
+                            if (connectThisClientFlag == 0)
+                            {
+                                Console.WriteLine("NO EXCEPTION THROWN - THEY ARE PROBABLY AVAILABLE - REJECT THIS CLIENT");
+                                byte[] msgn = System.Text.Encoding.ASCII.GetBytes("BUSY");
+                                stream.Write(msgn, 0, msgn.Length);
+                                client.Close();
+                            }
+
                         }
-                        
+                        else
+                        {
+                            Console.WriteLine("NO PREVIOUS CLIENT AVAILABLE - GIVE THIS SLOT TO NEW CLIENT");
+                            //no previous client - so allow new guy to connect
+                            connectThisClient(client, stream);
+                        }
                     }
                     else
                     {
-                        Console.WriteLine("NO PREVIOUS CLIENT AVAILABLE - GIVE THIS SLOT TO NEW CLIENT");
-                        //no previous client - so allow new guy to connect
-                        connectThisClient(client, stream);
+                        Console.WriteLine("WE DONT LIKE WHAT THIS GUY SAID. FUCK HIM!");
+                        client.Close();
                     }
                 }
-                else
-                {
-                    Console.WriteLine("WE DONT LIKE WHAT THIS GUY SAID. FUCK HIM!");
-                    client.Close();
-                }
             }
-            Console.WriteLine("Exited while");
+            catch (Exception e)
+            {
+                Console.WriteLine(e.StackTrace);
+            }
         }
 
         void connectThisClient(TcpClient currentClient, NetworkStream currentClientStream)
@@ -136,8 +152,18 @@ namespace GyroMouseServer
             Client.ssKey = sessionKey;
         }
 
-        public void stop()
+        public void kill()
         {
+            if (Client.tcpClient != null)
+            {
+                //Client.tcpClient.Close();
+                NetworkStream stream = Client.tcpClient.GetStream();
+                byte[] msg = System.Text.Encoding.ASCII.GetBytes("FIN");
+                stream.Write(msg, 0, msg.Length);
+                stream.Flush();
+            }
+            if (client != null)
+                client.Close();
             tcpServer.Stop();
         }
 

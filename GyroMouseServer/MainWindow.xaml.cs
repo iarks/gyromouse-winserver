@@ -36,6 +36,7 @@ namespace GyroMouseServer
         private ThreadStart waitingOnClientThreadStart;
         private Thread waitingOnClientThread;
         private Barrier sync;
+        private ClientRequestParser clientRequestHandler;
 
         // Notification managers
         private NotifyIcon notify;
@@ -137,7 +138,7 @@ namespace GyroMouseServer
             
 
             // start the thread which handles client requests. The request parser thread waits till a client is available
-            ClientRequestParser clientRequestHandler = new ClientRequestParser(blockingCollections, serverEndPoint, clientEndpoint, listeningPort, UIThread, ref sync);
+            clientRequestHandler = new ClientRequestParser(blockingCollections, serverEndPoint, clientEndpoint, listeningPort, UIThread, ref sync);
             clientRequestHandler.setUIElements(textBlock_notifications, textBlock_ip);
             clientRequestHandleThreadStart = new ThreadStart(clientRequestHandler.parseRequests);
             clientRequestHandleThread = new Thread(clientRequestHandleThreadStart);
@@ -161,40 +162,47 @@ namespace GyroMouseServer
 
         private void button_stopServer_Click(object sender, RoutedEventArgs e)
         {
-            // if client handler thread is running stop it
-            if (clientRequestHandleThread.IsAlive && clientRequestHandleThread != null)
-                clientRequestHandleThread.Abort();
-
-            if (waitingOnClientThread.IsAlive && waitingOnClientThread != null)
-                waitingOnClientThread.Abort();
-
-            //stop the client handler thread
-            if (TCPConnectionHandlerThread.IsAlive && TCPConnectionHandlerThread != null)
+            try
             {
-                //tCPConnectionHandler.getSyncContext().Send((object state) =>
-                //{
-                //    tCPConnectionHandler.stop();
-                //}, null);
-                TCPConnectionHandlerThread.Abort();
 
+                //close the ports
+                if (listeningPort != null)
+                {
+                    listeningPort.Close();
+                }
+                else if (listeningPort == null)
+                {
+
+                }
+
+                if (clientRequestHandleThread != null && clientRequestHandleThread.IsAlive)
+                {
+                    clientRequestHandleThread.Abort("Application shutting down");
+                }
+
+                if (tCPConnectionHandler!=null && TCPConnectionHandlerThread.IsAlive)
+                {
+                    tCPConnectionHandler.kill();
+                    //TCPConnectionHandlerThread.Abort();
+                    
+                }
+
+
+
+
+                //update UI elements
+                textBlock_notifications.Text = "Server Stopped";
+                textBlock_ip.Text = "";
+                textBlock_port.Text = "";
+
+                // toggle buttons
+                button_startServer.IsEnabled = true;
+                button_stopServer.IsEnabled = false;
             }
-                
-
-            // close the port
-            if (listeningPort != null)
-                listeningPort.Close();
-
-            if (tcpServer != null)
-                tcpServer.Stop();
-
-            // update UI elements
-            textBlock_notifications.Text = "Server Stopped";
-            textBlock_ip.Text = "";
-            textBlock_port.Text = "";
-
-            // toggle buttons
-            button_startServer.IsEnabled = true;
-            button_stopServer.IsEnabled = false;
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+            }
         }
 
         private void button_settings_Click(object sender, RoutedEventArgs e)

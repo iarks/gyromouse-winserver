@@ -26,10 +26,6 @@ namespace GyroMouseServer_ClientRequestHandler
         private float dxf, dyf;
         private Barrier sync;
 
-        JToken headerJT = null;
-        JToken paramJT = null;
-        JToken sessKeyJT = null;
-
         string ssKey = null;
         string header = null, param = null;
 
@@ -95,7 +91,7 @@ namespace GyroMouseServer_ClientRequestHandler
                         switch (extractedCommand[0])
                         {
                             case "CANHAVEIP?":
-                                Byte[] responseData = Encoding.ASCII.GetBytes(LocalHost.getLocalHost());
+                                Byte[] responseData = Encoding.ASCII.GetBytes(System.Environment.MachineName);
                                 string[] requstIP = clientEndPoint.ToString().Split(':');
                                 Console.WriteLine("ClientIP>> " + requstIP[0]);
                                 newSocket.Send(responseData, responseData.Length, clientEndPoint);
@@ -158,7 +154,9 @@ namespace GyroMouseServer_ClientRequestHandler
                                 dxf = float.Parse(extractedCommand[0]);
                                 dyf = float.Parse(extractedCommand[1]);
                                 if (!firstVal)
+                                {
                                     mouse.movePointer(dxf * GyroMouseServer.Properties.Settings.Default.sensitivity, dyf * GyroMouseServer.Properties.Settings.Default.sensitivity);
+                                }
                                 else
                                     firstVal = false;
                                 break;
@@ -176,6 +174,9 @@ namespace GyroMouseServer_ClientRequestHandler
             }
         }
 
-        
+        public void kill()
+        {
+            newSocket.Close();
+        }
     }
 }

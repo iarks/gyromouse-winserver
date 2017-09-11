@@ -15,6 +15,8 @@ namespace GyroMouseServer
                 case ")":
                 case "{":
                 case "}":
+                case "+":
+                case "^":
                     InputSimulator.SimulateTextEntry(character);
                     return;
             }
