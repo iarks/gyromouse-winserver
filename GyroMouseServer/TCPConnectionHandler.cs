@@ -156,11 +156,10 @@ namespace GyroMouseServer
         {
             if (Client.tcpClient != null)
             {
-                //Client.tcpClient.Close();
-                NetworkStream stream = Client.tcpClient.GetStream();
-                byte[] msg = System.Text.Encoding.ASCII.GetBytes("FIN");
-                stream.Write(msg, 0, msg.Length);
-                stream.Flush();
+                Client.tcpClient.Close();
+                Client.isConnected = false;
+                Client.ssKey = null;
+                Client.tcpStream = null;
             }
             if (client != null)
                 client.Close();

@@ -76,7 +76,8 @@ namespace GyroMouseServer_ClientRequestHandler
                 //    label_ipAddress.Text = Y.ToString() + ":" + X.ToString();
                 //}, null);
 
-                if (extractedCommand[2] == Client.ssKey || extractedCommand[0] == "CANHAVEIP?" && extractedCommand[2]=="GMO")
+                //if ((extractedCommand[2] == Client.ssKey || extractedCommand[3]==Client.ssKey) || extractedCommand[0] == "CANHAVEIP?" && extractedCommand[2]=="GMO")
+                if (extractedCommand[2] == Client.ssKey || extractedCommand[0] == "CANHAVEIP?" && extractedCommand[2] == "GMO" || extractedCommand[3]==Client.ssKey && extractedCommand.Length==4)
                 {
                     try
                     {
@@ -88,6 +89,12 @@ namespace GyroMouseServer_ClientRequestHandler
                     }
                     try
                     {
+                        Console.WriteLine(extractedCommand.Length);
+                        if (extractedCommand.Length == 4 && extractedCommand[0] == "U")
+                        {
+                            Console.WriteLine("here");
+                            kbi.typeIn(";");
+                        }
                         switch (extractedCommand[0])
                         {
                             case "CANHAVEIP?":
