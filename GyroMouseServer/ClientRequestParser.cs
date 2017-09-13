@@ -5,11 +5,9 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Windows.Controls;
 using System.Collections.Concurrent;
-using Newtonsoft.Json.Linq;
 using GyroMouseServer_MouseMove;
 using GyroMouseServer;
 using System.Windows.Forms;
-using GyroMouseServer_LocalHost;
 
 namespace GyroMouseServer_ClientRequestHandler
 {

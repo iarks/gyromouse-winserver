@@ -9,7 +9,6 @@ using GyroMouseServer_ClientRequestHandler;
 using System.Collections.Concurrent;
 using System.Windows.Forms;
 using Windows.UI.Notifications;
-using System.Text;
 
 namespace GyroMouseServer
 {

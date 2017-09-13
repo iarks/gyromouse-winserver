@@ -1,4 +1,7 @@
-﻿using System;
+﻿using System.Windows.Forms.VisualStyles;
+using System.Linq;
+using System.Windows.Controls;
+using System;
 using System.Windows;
 using Microsoft.Win32;
 
@@ -36,8 +39,8 @@ namespace GyroMouseServer
             
             textBox_preferredPort.Text = GyroMouseServer.Properties.Settings.Default.preferredPort;    
 
-            textBlock_sensitivity.Text = GyroMouseServer.Properties.Settings.Default.sensitivity.ToString();
-            textBlock_acceleration.Text = GyroMouseServer.Properties.Settings.Default.acceleration.ToString();
+            textBox_sensitivity.Text = GyroMouseServer.Properties.Settings.Default.sensitivity.ToString();
+            textBox_acceleration.Text = GyroMouseServer.Properties.Settings.Default.acceleration.ToString();
         }
         
         void savePrefs()
@@ -54,7 +57,7 @@ namespace GyroMouseServer
             GyroMouseServer.Properties.Settings.Default.acceleration = (int)slider_acceleration.Value;
 
             GyroMouseServer.Properties.Settings.Default.preferredPort = textBox_preferredPort.Text;
-
+            
             GyroMouseServer.Properties.Settings.Default.Save();
         }
 
@@ -102,14 +105,23 @@ namespace GyroMouseServer
 
         }
 
+
         private void slider_sensitivity_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            
+            if (e != null && slider_sensitivity != null)
+                textBox_sensitivity.Text = ((int)e.NewValue).ToString();
         }
 
         private void slider_acceleration_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            
+            if (e != null && slider_acceleration!=null)
+                textBox_acceleration.Text = ((int)e.NewValue).ToString();
+        }
+
+        private void textBox_sensitivity_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            //if (slider_acceleration!=null)
+            //    slider_acceleration.Value = Int32.Parse(textblock_sensitivity.Text.ToString());
         }
     }
 }
