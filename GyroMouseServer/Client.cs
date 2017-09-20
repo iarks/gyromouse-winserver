@@ -1,4 +1,5 @@
-﻿using System.Net.Sockets;
+﻿using System.Threading;
+using System.Net.Sockets;
 
 namespace GyroMouseServer
 {
@@ -9,5 +10,13 @@ namespace GyroMouseServer
         public static TcpClient tcpClient;
         public static NetworkStream tcpStream;
         public static string ssKey;
+
+        public static void reset()
+        {
+            isConnected = false;
+            tcpClient = null;
+            tcpStream = null;
+            ssKey = null;
+        }
     }
 }

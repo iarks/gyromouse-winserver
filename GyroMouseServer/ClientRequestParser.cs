@@ -75,7 +75,7 @@ namespace GyroMouseServer_ClientRequestHandler
                 //}, null);
 
                 //if ((extractedCommand[2] == Client.ssKey || extractedCommand[3]==Client.ssKey) || extractedCommand[0] == "CANHAVEIP?" && extractedCommand[2]=="GMO")
-                if (extractedCommand[2] == Client.ssKey || extractedCommand[0] == "CANHAVEIP?" && extractedCommand[2] == "GMO" || extractedCommand[3]==Client.ssKey && extractedCommand.Length==4)
+                if ((extractedCommand.Length == 3 && extractedCommand[2] == Client.ssKey) || (extractedCommand[0] == "CANHAVEIP?" && extractedCommand[2] == "GMO") || (extractedCommand.Length == 4 && extractedCommand[3]==Client.ssKey))
                 {
                     try
                     {

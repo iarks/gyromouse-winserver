@@ -186,6 +186,8 @@ namespace GyroMouseServer
                     
                 }
 
+               
+
 
 
 
@@ -197,6 +199,8 @@ namespace GyroMouseServer
                 // toggle buttons
                 button_startServer.IsEnabled = true;
                 button_stopServer.IsEnabled = false;
+
+                Client.reset();
             }
             catch(Exception ex)
             {
