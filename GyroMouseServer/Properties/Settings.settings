@@ -20,11 +20,14 @@
     <Setting Name="acceleration" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">50</Value>
     </Setting>
-    <Setting Name="preferredPort" Type="System.String" Scope="User">
+    <Setting Name="preferredUDPPort" Type="System.String" Scope="User">
       <Value Profile="(Default)">9050</Value>
     </Setting>
     <Setting Name="autoServe" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="preferredTCPPort" Type="System.String" Scope="User">
+      <Value Profile="(Default)">13000</Value>
     </Setting>
   </Settings>
 </SettingsFile>

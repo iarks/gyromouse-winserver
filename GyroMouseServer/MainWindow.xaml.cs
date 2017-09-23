@@ -22,7 +22,7 @@ namespace GyroMouseServer
         // TCP variables --
         private IPAddress serverIPAddr = IPAddress.Parse(LocalHost.getLocalHost());
         private TcpListener tcpServer = null;
-        private Int32 tcpPort=13000;
+        private Int32 tcpPort= Int32.Parse(GyroMouseServer.Properties.Settings.Default.preferredTCPPort);
 
 
         // Thread variables
@@ -81,6 +81,8 @@ namespace GyroMouseServer
             //toast.Activated += ToastActivated;
             //toast.Dismissed += ToastDismissed;
             //toast.Failed += ToastFailed;
+
+            ServerState.applicationRunning = true;
         }
 
         //private void ToastFailed(ToastNotification sender, ToastFailedEventArgs args)
@@ -118,7 +120,7 @@ namespace GyroMouseServer
         private void button_startServer_Click(object sender, RoutedEventArgs e)
         {
             // initialise serverside endpoint
-            serverEndPoint = new IPEndPoint(IPAddress.Any, Int32.Parse(GyroMouseServer.Properties.Settings.Default.preferredPort));
+            serverEndPoint = new IPEndPoint(IPAddress.Any, Int32.Parse(GyroMouseServer.Properties.Settings.Default.preferredUDPPort));
 
             // start listening
             listeningPort = new UdpClient(serverEndPoint);
@@ -138,15 +140,15 @@ namespace GyroMouseServer
 
             // start the thread which handles client requests. The request parser thread waits till a client is available
             clientRequestHandler = new ClientRequestParser(blockingCollections, serverEndPoint, clientEndpoint, listeningPort, UIThread, ref sync);
-            clientRequestHandler.setUIElements(textBlock_notifications, textBlock_ip);
-            clientRequestHandleThreadStart = new ThreadStart(clientRequestHandler.parseRequests);
+            clientRequestHandler.SetUIElements(textBlock_notifications, textBlock_ip);
+            clientRequestHandleThreadStart = new ThreadStart(clientRequestHandler.ParseRequests);
             clientRequestHandleThread = new Thread(clientRequestHandleThreadStart);
             clientRequestHandleThread.Name = "clientRequestHandleThread";
             clientRequestHandleThread.Start();
 
             // start the tcpConnectionHandler Thread
             tCPConnectionHandler = new TCPConnectionHandler(serverIPAddr, tcpServer, tcpPort);
-            ThreadStart ts = new ThreadStart(tCPConnectionHandler.run);
+            ThreadStart ts = new ThreadStart(tCPConnectionHandler.Run);
             TCPConnectionHandlerThread = new Thread(ts);
             TCPConnectionHandlerThread.Start();
 
@@ -156,6 +158,8 @@ namespace GyroMouseServer
 
             // generate a toast
             Toast.generateToastInfo(5000, "Server Started", LocalHost.getLocalHost() + " : " + serverEndPoint.ToString().Substring(serverEndPoint.ToString().LastIndexOf(':') + 1));
+
+            ServerState.serverRunning = true;
         }
 
 
@@ -181,7 +185,7 @@ namespace GyroMouseServer
 
                 if (tCPConnectionHandler!=null && TCPConnectionHandlerThread.IsAlive)
                 {
-                    tCPConnectionHandler.kill();
+                    tCPConnectionHandler.Kill();
                     //TCPConnectionHandlerThread.Abort();
                     
                 }
@@ -201,6 +205,8 @@ namespace GyroMouseServer
                 button_stopServer.IsEnabled = false;
 
                 Client.reset();
+
+                ServerState.serverRunning = false;
             }
             catch(Exception ex)
             {
@@ -212,7 +218,10 @@ namespace GyroMouseServer
         {
             // open settings window
             PreferencesWindow prefWin = new PreferencesWindow();
-            prefWin.Show();
+            prefWin.Owner = this;
+            prefWin.ShowDialog();
+
+
         }
 
         private void button_about_Click(object sender, RoutedEventArgs e)
@@ -248,6 +257,12 @@ namespace GyroMouseServer
 
             // Shutdown the application.
             System.Windows.Application.Current.Shutdown();
+        }
+
+        public void restartServer()
+        {
+            button_stopServer_Click(null, null);
+            button_startServer_Click(null, null);
         }
         
     }

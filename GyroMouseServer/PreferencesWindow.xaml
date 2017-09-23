@@ -5,7 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GyroMouseServer"
         mc:Ignorable="d"
-        Title="PreferencesWindow" Height="500" Width="500">
+        ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner" 
+        Title="Preferences Window" Height="500" Width="500" ResizeMode="NoResize" Closing="Window_Closing">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="10"/>
@@ -74,24 +76,27 @@
                 <Grid Background="#FFE5E5E5">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="10"/>
-                        <ColumnDefinition Width="125"/>
+                        <ColumnDefinition Width="180"/>
                         <ColumnDefinition/>
                         <ColumnDefinition Width="10"/>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="10"/>
                         <RowDefinition Height="40"/>
+                        <RowDefinition Height="40"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="10"/>
                     </Grid.RowDefinitions>
-                    <TextBlock Grid.Column="1" Margin="10,12,0,12" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Center" Text="Override Port address" Height="16"/>
-                    <TextBox x:Name="textBox_preferredPort" Grid.Column="2" Height="24" Margin="10,0,10,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                    <TextBlock Grid.Column="1" Margin="10,10" Grid.Row="1" TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Override UDP Port address" Height="16"/>
+                    <TextBlock Grid.Column="1" Margin="10,10" Grid.Row="2" TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Override TCP Port address" Height="16"/>
+                    <TextBox x:Name="textBox_preferredUDPPort" Grid.Column="2" Height="24" Margin="10,10" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" KeyDown="textBox_preferredUDPPort_KeyDown"/>
+                    <TextBox x:Name="textBox_preferredTCPPort" Grid.Column="2" Height="24" Margin="10,10" Grid.Row="2" TextWrapping="Wrap" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" KeyDown="textBox_preferredTCPPort_KeyDown"/>
                 </Grid>
             </TabItem>
 
         </TabControl>
-        <Button x:Name="button_done" Content="Done" HorizontalAlignment="Left" Margin="387,20,0,0" Grid.Row="1" Width="75" Grid.Column="1" Click="button_done_click"/>
-        <Button x:Name="button_apply" Content="Apply" HorizontalAlignment="Left" Margin="307,20,0,0" Grid.Row="1" Width="75" Grid.Column="1" Click="button_apply_Click"/>
+        <Button x:Name="button_done" Content="Done" HorizontalAlignment="Left" Margin="387,20,0,0" Grid.Row="1" Width="75" Grid.Column="1" Click="Button_done_click" Height="20" VerticalAlignment="Top"/>
+        <Button x:Name="button_apply" Content="Apply" HorizontalAlignment="Left" Margin="307,20,0,0" Grid.Row="1" Width="75" Grid.Column="1" Click="Button_apply_Click"/>
         <Button x:Name="button_resetPage" Content="Reset Page" HorizontalAlignment="Left" Margin="227,20,0,0" Grid.Row="1" VerticalAlignment="Top" Width="75" Grid.Column="1" Click="button_resetPage_Click"/>
 
     </Grid>

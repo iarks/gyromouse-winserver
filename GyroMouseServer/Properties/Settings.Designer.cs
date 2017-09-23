@@ -98,12 +98,12 @@ namespace GyroMouseServer.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("9050")]
-        public string preferredPort {
+        public string preferredUDPPort {
             get {
-                return ((string)(this["preferredPort"]));
+                return ((string)(this["preferredUDPPort"]));
             }
             set {
-                this["preferredPort"] = value;
+                this["preferredUDPPort"] = value;
             }
         }
         
@@ -116,6 +116,18 @@ namespace GyroMouseServer.Properties {
             }
             set {
                 this["autoServe"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("13000")]
+        public string preferredTCPPort {
+            get {
+                return ((string)(this["preferredTCPPort"]));
+            }
+            set {
+                this["preferredTCPPort"] = value;
             }
         }
     }

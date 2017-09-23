@@ -26,7 +26,7 @@ namespace GyroMouseServer
             this.tcpPort = tcpPort;
         }
 
-        public void run()
+        public void Run()
         {
             Byte[] receivedBytes = new Byte[256];
             String receivedString = null;
@@ -93,7 +93,7 @@ namespace GyroMouseServer
                                 if (receivedString != "YES")
                                 {
                                     Console.WriteLine("PREVIOUS CLIENT IS UNAVAILABLE");
-                                    connectThisClient(client, stream);
+                                    ConnectThisClient(client, stream);
                                     connectThisClientFlag = 1;
                                 }
                             }
@@ -102,7 +102,8 @@ namespace GyroMouseServer
                                 // means old stream is redundant and no client is available
                                 Console.WriteLine("EXCEPTION THROWN - THEY ARE PROBABLY NOT AVAILABLE - SO GIVE THIS SLOT TO THE NEW CLIENT");
                                 connectThisClientFlag = 1;
-                                connectThisClient(client, stream);
+                                ConnectThisClient(client, stream);
+                                Console.WriteLine(e.StackTrace);
                             }
 
                             if (connectThisClientFlag == 0)
@@ -118,7 +119,7 @@ namespace GyroMouseServer
                         {
                             Console.WriteLine("NO PREVIOUS CLIENT AVAILABLE - GIVE THIS SLOT TO NEW CLIENT");
                             //no previous client - so allow new guy to connect
-                            connectThisClient(client, stream);
+                            ConnectThisClient(client, stream);
                         }
                     }
                     else
@@ -134,7 +135,7 @@ namespace GyroMouseServer
             }
         }
 
-        void connectThisClient(TcpClient currentClient, NetworkStream currentClientStream)
+        void ConnectThisClient(TcpClient currentClient, NetworkStream currentClientStream)
         {
             string sessionKey = SessionKeyGenerator.generateRandom();
             byte[] msg = System.Text.Encoding.ASCII.GetBytes(sessionKey);
@@ -152,7 +153,7 @@ namespace GyroMouseServer
             Client.ssKey = sessionKey;
         }
 
-        public void kill()
+        public void Kill()
         {
             if (Client.tcpClient != null)
             {
@@ -166,7 +167,7 @@ namespace GyroMouseServer
             tcpServer.Stop();
         }
 
-        public SynchronizationContext getSyncContext()
+        public SynchronizationContext GetSyncContext()
         {
             return SynchronizationContext.Current;
         }

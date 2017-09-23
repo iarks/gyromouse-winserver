@@ -39,7 +39,7 @@ namespace GyroMouseServer_MouseMove
             int smoothing = 1000;
             x = x + (x - pastX) / smoothing;
             y = y + (y - pastX) / smoothing;
-            movePointer(x*15, y*15);
+            movePointer(x*GyroMouseServer.Properties.Settings.Default.sensitivity, y*GyroMouseServer.Properties.Settings.Default.sensitivity);
         }
 
 

@@ -25,7 +25,6 @@ namespace GyroMouseServer_ClientRequestHandler
         private float dxPast=0.0f, dyPast=0.0f;
         private Barrier sync;
 
-        string ssKey = null;
         string header = null, param = null;
 
         private KeyboardInput kbi = new KeyboardInput();
@@ -44,15 +43,15 @@ namespace GyroMouseServer_ClientRequestHandler
             this.sync = sync;
         }
 
-        public void setUIElements(TextBlock label_messages, TextBlock label_ipAddress)
+        public void SetUIElements(TextBlock label_messages, TextBlock label_ipAddress)
         {
             this.label_messages = label_messages;
             this.label_ipAddress = label_ipAddress;
         }
 
-        public void parseRequests()
+        public void ParseRequests()
         {
-            ssKey = null;
+            
             header = null;
             param = null;
 
@@ -73,7 +72,7 @@ namespace GyroMouseServer_ClientRequestHandler
                     receivedCommand = Encoding.UTF8.GetString(receivedByte, 0, receivedByte.Length);
                 }catch(Exception e)
                 {
-
+                    Console.WriteLine(e.StackTrace);
                 }
                 Console.WriteLine(receivedCommand);
 
@@ -94,7 +93,7 @@ namespace GyroMouseServer_ClientRequestHandler
                     }
                     catch(Exception e)
                     {
-
+                        Console.WriteLine(e.StackTrace);
                     }
                     try
                     {
@@ -187,7 +186,8 @@ namespace GyroMouseServer_ClientRequestHandler
                     }
                     catch (Exception e)
                     {
-                        Console.Write(header + "," + param);
+                        Console.WriteLine(header + "," + param);
+                        Console.WriteLine(e.StackTrace);
                     }
                 }
                 
@@ -197,7 +197,7 @@ namespace GyroMouseServer_ClientRequestHandler
             }
         }
 
-        public void kill()
+        public void Kill()
         {
             newSocket.Close();
         }

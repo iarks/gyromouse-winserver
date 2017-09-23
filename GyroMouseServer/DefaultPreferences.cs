@@ -13,6 +13,7 @@ namespace GyroMouseServer
         public static int sensitivity = 25;
         public static int acceleration = 50;
 
-        public static String preferredPort = "9050";
+        public static String preferredUDPPort = "9050";
+        public static String preferredTCPPort = "13000";
     }
 }

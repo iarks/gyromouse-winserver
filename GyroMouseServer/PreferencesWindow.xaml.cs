@@ -1,32 +1,50 @@
-﻿using System.Windows.Forms.VisualStyles;
-using System.Linq;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 using System;
 using System.Windows;
 using Microsoft.Win32;
+using System.Windows.Forms;
 
 namespace GyroMouseServer
 {
     public partial class PreferencesWindow : Window
     {
+        String initUDP, initTCP;
+        bool advanceChangesMade = false;
         public PreferencesWindow()
         {
             InitializeComponent();
-            loadPreferences();
+            LoadPreferences();
         }
 
-        private void button_done_click(object sender, RoutedEventArgs e)
+        private void Button_done_click(object sender, RoutedEventArgs e)
         {
             savePrefs();
             Close();
+            if(advanceChangesMade==true && ServerState.serverRunning==true)
+            {
+                string messageBoxText = "Port addresses changed.\nRestart server for changes to take effect?";
+                string caption = "Gyro Mouse";
+                MessageBoxButton button = MessageBoxButton.OKCancel;
+                MessageBoxImage icon = MessageBoxImage.Information;
+                MessageBoxResult result = System.Windows.MessageBox.Show(messageBoxText, caption, button, icon);
+
+                // Process message box results
+                switch (result)
+                {
+                    case MessageBoxResult.OK:
+                        var main = (MainWindow)this.Owner;
+                        main.restartServer();
+                        break;
+                }
+            }
         }
 
-        private void button_apply_Click(object sender, RoutedEventArgs e)
+        private void Button_apply_Click(object sender, RoutedEventArgs e)
         {
             savePrefs();
         }
 
-        void loadPreferences()
+        void LoadPreferences()
         {
             checkBox_autoStart.IsChecked = GyroMouseServer.Properties.Settings.Default.autoStart;
             checkBox_autoServer.IsChecked = GyroMouseServer.Properties.Settings.Default.autoServe;
@@ -37,10 +55,14 @@ namespace GyroMouseServer
             slider_sensitivity.Value = GyroMouseServer.Properties.Settings.Default.sensitivity;
             slider_acceleration.Value = GyroMouseServer.Properties.Settings.Default.acceleration;
             
-            textBox_preferredPort.Text = GyroMouseServer.Properties.Settings.Default.preferredPort;    
+            textBox_preferredUDPPort.Text = GyroMouseServer.Properties.Settings.Default.preferredUDPPort;
+            textBox_preferredTCPPort.Text = GyroMouseServer.Properties.Settings.Default.preferredTCPPort;
 
             textBox_sensitivity.Text = GyroMouseServer.Properties.Settings.Default.sensitivity.ToString();
             textBox_acceleration.Text = GyroMouseServer.Properties.Settings.Default.acceleration.ToString();
+            
+            initUDP = GyroMouseServer.Properties.Settings.Default.preferredUDPPort;
+            initTCP = GyroMouseServer.Properties.Settings.Default.preferredTCPPort;
         }
         
         void savePrefs()
@@ -56,9 +78,32 @@ namespace GyroMouseServer
 
             GyroMouseServer.Properties.Settings.Default.acceleration = (int)slider_acceleration.Value;
 
-            GyroMouseServer.Properties.Settings.Default.preferredPort = textBox_preferredPort.Text;
+            if (textBox_preferredUDPPort.Text != "")
+                GyroMouseServer.Properties.Settings.Default.preferredUDPPort = textBox_preferredUDPPort.Text;
             
+
+            if(textBox_preferredTCPPort.Text != "")
+                GyroMouseServer.Properties.Settings.Default.preferredTCPPort = textBox_preferredTCPPort.Text;
+
             GyroMouseServer.Properties.Settings.Default.Save();
+
+            checkAdvanceChangesMade();
+
+            
+            
+        }
+
+        void checkAdvanceChangesMade()
+        {
+            if (initTCP != GyroMouseServer.Properties.Settings.Default.preferredTCPPort || initUDP != GyroMouseServer.Properties.Settings.Default.preferredUDPPort)
+            {
+                advanceChangesMade = true;
+            }
+
+            if (GyroMouseServer.Properties.Settings.Default.preferredTCPPort == initTCP && GyroMouseServer.Properties.Settings.Default.preferredUDPPort == initUDP)
+            {
+                advanceChangesMade = false;
+            }
         }
 
         private void checkBox_autoStart_Click(object sender, RoutedEventArgs e)
@@ -88,7 +133,8 @@ namespace GyroMouseServer
                     slider_acceleration.Value = DefaultPreferences.acceleration;
                     break;
                 case 2:
-                    textBox_preferredPort.Text = DefaultPreferences.preferredPort;
+                    textBox_preferredUDPPort.Text = DefaultPreferences.preferredUDPPort;
+                    textBox_preferredTCPPort.Text = DefaultPreferences.preferredTCPPort;
                     break;
             }
         }
@@ -122,6 +168,63 @@ namespace GyroMouseServer
         {
             //if (slider_acceleration!=null)
             //    slider_acceleration.Value = Int32.Parse(textblock_sensitivity.Text.ToString());
+        }
+
+        
+
+
+        private void textBox_preferredUDPPort_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            String key = e.Key.ToString();
+            String lastKey = key.Substring(key.Length - 1, 1);
+            switch(lastKey)
+            {
+                case "9":
+                case "8":
+                case "7":
+                case "6":
+                case "5":
+                case "4":
+                case "3":
+                case "2":
+                case "1":
+                case "0":
+                    break;
+                default:
+                    WinkeyInput.KeyDown(Keys.Back);
+                    WinkeyInput.KeyUp(Keys.Back);
+                    break;
+            }
+            
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+
+        }
+
+        private void textBox_preferredTCPPort_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            String key = e.Key.ToString();
+            String lastKey = key.Substring(key.Length - 1, 1);
+            switch (lastKey)
+            {
+                case "9":
+                case "8":
+                case "7":
+                case "6":
+                case "5":
+                case "4":
+                case "3":
+                case "2":
+                case "1":
+                case "0":
+                    break;
+                default:
+                    WinkeyInput.KeyDown(Keys.Back);
+                    WinkeyInput.KeyUp(Keys.Back);
+                    break;
+            }
         }
     }
 }

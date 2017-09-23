@@ -86,6 +86,7 @@
     <Compile Include="PreferencesWindow.xaml.cs">
       <DependentUpon>PreferencesWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ServerState.cs" />
     <Compile Include="SessionKeyGenerator.cs" />
     <Compile Include="TCPClientListener.cs" />
     <Compile Include="TCPConnectionHandler.cs" />
