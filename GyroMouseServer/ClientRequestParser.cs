@@ -22,6 +22,7 @@ namespace GyroMouseServer_ClientRequestHandler
         private TextBlock label_messages,label_ipAddress;
         private bool firstVal = false;
         private float dxf, dyf;
+        private float dxPast=0.0f, dyPast=0.0f;
         private Barrier sync;
 
         string ssKey = null;
@@ -59,11 +60,21 @@ namespace GyroMouseServer_ClientRequestHandler
             {
                 Console.WriteLine("I'm in while!!");
 
-                // received byte
-                receivedByte = newSocket.Receive(ref this.clientEndPoint);
+                
+                
 
-                // convert byte to string
-                receivedCommand = Encoding.UTF8.GetString(receivedByte, 0, receivedByte.Length);
+                
+                try
+                {
+                    // received byte
+                    receivedByte = newSocket.Receive(ref this.clientEndPoint);
+
+                    // convert byte to string
+                    receivedCommand = Encoding.UTF8.GetString(receivedByte, 0, receivedByte.Length);
+                }catch(Exception e)
+                {
+
+                }
                 Console.WriteLine(receivedCommand);
 
                 string[] extractedCommand = receivedCommand.Split(';');
@@ -103,6 +114,8 @@ namespace GyroMouseServer_ClientRequestHandler
                                 break;
                             case "EOT":
                                 firstVal = true;
+                                dxPast = 0.0f;
+                                dyPast = 0.0f;
                                 break;
                             case "LD":
                                 mouse.leftDown();
@@ -160,7 +173,12 @@ namespace GyroMouseServer_ClientRequestHandler
                                 dyf = float.Parse(extractedCommand[1]);
                                 if (!firstVal)
                                 {
-                                    mouse.movePointer(dxf * GyroMouseServer.Properties.Settings.Default.sensitivity, dyf * GyroMouseServer.Properties.Settings.Default.sensitivity);
+                                    //mouse.movePointer((dxf/10) * GyroMouseServer.Properties.Settings.Default.sensitivity, (dyf/10) * GyroMouseServer.Properties.Settings.Default.sensitivity);
+                                    //mouse.movePointer((dxf  ) * 25, (dyf ) * 25);
+                                    mouse.smoothMovePointer(dxf, dyf, dxPast, dyPast);
+                                    dxPast = dxf;
+                                    dyPast = dyf;
+                                    //mouse.movePointer(dxf*25, dyf*25);
                                 }
                                 else
                                     firstVal = false;

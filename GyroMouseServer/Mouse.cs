@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Drawing.Drawing2D;
+using System;
 using System.Threading;
 using Windows.UI.Input;
 using System.Runtime.InteropServices;
@@ -23,51 +24,61 @@ namespace GyroMouseServer_MouseMove
 
         private const int MOUSEEVENTF_WHEEL = 0x0800;
 
-        //public void movePointer(float x, float y)
-        //{
-        //    int a = (int)x;
-        //    int b = (int)y;
-
-        //    Console.WriteLine("startPosition " + Cursor.Position.X + "," + Cursor.Position.Y);
-
-        //    SetCursorPos(Cursor.Position.X + a, Cursor.Position.Y + b);
-        //}
-
         public void movePointer(float x, float y)
         {
-            Point newPosition = new Point();
-            newPosition.X = Cursor.Position.X+(int)x;
-            newPosition.Y = Cursor.Position.Y+(int)y;
-            Console.WriteLine(newPosition.X.ToString() + "," + newPosition.Y.ToString());
+            int a = (int)x;
+            int b = (int)y;
 
-            int steps = 1000;
-            int MouseEventDelayMS = 1;
+            //Console.WriteLine("startPosition " + Cursor.Position.X + "," + Cursor.Position.Y);
 
-
-            Point start = new Point();
-            start.X = Cursor.Position.X;
-            start.Y = Cursor.Position.Y;
-            Console.WriteLine("startPosition " + Cursor.Position.X + "," + Cursor.Position.Y);
-
-            PointF iterPoint = start;
-
-            // Find the slope of the line segment defined by start and newPosition
-            PointF slope = new PointF(newPosition.X - start.X, newPosition.Y - start.Y);
-
-            // Divide by the number of steps
-            slope.X = slope.X / steps;
-            slope.Y = slope.Y / steps;
-
-            for (int i = 0; i < steps; i++)
-            {
-                iterPoint = new PointF(iterPoint.X + slope.X, iterPoint.Y + slope.Y);
-                SetCursorPos((int)iterPoint.X, (int)iterPoint.Y);
-                //Thread.Sleep(MouseEventDelayMS);
-            }
-
-            // Move the mouse to the final destination.
-            SetCursorPos(newPosition.X,newPosition.Y);
+            SetCursorPos(Cursor.Position.X + a, Cursor.Position.Y + b);
         }
+
+        public void smoothMovePointer(float x, float y, float pastX, float pastY)
+        {
+            int smoothing = 1000;
+            x = x + (x - pastX) / smoothing;
+            y = y + (y - pastX) / smoothing;
+            movePointer(x*15, y*15);
+        }
+
+
+
+        //public void movePointer(float x, float y)
+        //{
+        //    Point newPosition = new Point();
+        //    newPosition.X = Cursor.Position.X+(int)x;
+        //    newPosition.Y = Cursor.Position.Y+(int)y;
+        //    Console.WriteLine(newPosition.X.ToString() + "," + newPosition.Y.ToString());
+
+        //    int steps = 1000;
+        //    int MouseEventDelayMS = 1;
+
+
+        //    Point start = new Point();
+        //    start.X = Cursor.Position.X;
+        //    start.Y = Cursor.Position.Y;
+        //    Console.WriteLine("startPosition " + Cursor.Position.X + "," + Cursor.Position.Y);
+
+        //    PointF iterPoint = start;
+
+        //    // Find the slope of the line segment defined by start and newPosition
+        //    PointF slope = new PointF(newPosition.X - start.X, newPosition.Y - start.Y);
+
+        //    // Divide by the number of steps
+        //    slope.X = slope.X / steps;
+        //    slope.Y = slope.Y / steps;
+
+        //    for (int i = 0; i < steps; i++)
+        //    {
+        //        iterPoint = new PointF(iterPoint.X + slope.X, iterPoint.Y + slope.Y);
+        //        SetCursorPos((int)iterPoint.X, (int)iterPoint.Y);
+        //        //Thread.Sleep(MouseEventDelayMS);
+        //    }
+
+        //    // Move the mouse to the final destination.
+        //    SetCursorPos(newPosition.X,newPosition.Y);
+        //}
 
         public void leftDown()
         {
