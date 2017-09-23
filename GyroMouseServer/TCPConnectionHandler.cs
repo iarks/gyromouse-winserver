@@ -46,17 +46,19 @@ namespace GyroMouseServer
                     Console.WriteLine("Connected!");
 
                     NetworkStream stream = client.GetStream();
-
+                    stream.ReadTimeout = 3000;
                     int i;
 
                     // Loop to receive all the data sent by the client.
-                    while ((i = stream.Read(receivedBytes, 0, receivedBytes.Length)) != 0)
-                    {
-                        // Translate data bytes to a ASCII string.
-                        receivedString = System.Text.Encoding.ASCII.GetString(receivedBytes, 0, i);
-                        Console.WriteLine("Received from new client: {0}", receivedString);
-                        break;
-                    }
+                    
+                        while ((i = stream.Read(receivedBytes, 0, receivedBytes.Length)) != 0)
+                        {
+                            // Translate data bytes to a ASCII string.
+                            receivedString = System.Text.Encoding.ASCII.GetString(receivedBytes, 0, i);
+                            Console.WriteLine("Received from new client: {0}", receivedString);
+                            break;
+                        }
+                    
 
                     Console.WriteLine("Received from new client - printing outside while: {0}", receivedString);
 
@@ -78,6 +80,7 @@ namespace GyroMouseServer
                             {
                                 Console.WriteLine("ASKING UDERE?");
                                 NetworkStream str = Client.tcpClient.GetStream();
+                                str.ReadTimeout = 2000;
                                 str.Write(msg, 0, msg.Length);
                                 str.Flush();
 
@@ -97,10 +100,10 @@ namespace GyroMouseServer
                                     connectThisClientFlag = 1;
                                 }
                             }
-                            catch (IOException e)
+                            catch (Exception e)
                             {
                                 // means old stream is redundant and no client is available
-                                Console.WriteLine("EXCEPTION THROWN - THEY ARE PROBABLY NOT AVAILABLE - SO GIVE THIS SLOT TO THE NEW CLIENT");
+                                Console.WriteLine("EXCEPTION THROWN - THEY ARE PROBABLY NOT AVAILABLE - OR TIMED OUT - SO GIVE THIS SLOT TO THE NEW CLIENT");
                                 connectThisClientFlag = 1;
                                 ConnectThisClient(client, stream);
                                 Console.WriteLine(e.StackTrace);
