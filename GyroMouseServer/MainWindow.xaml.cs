@@ -22,7 +22,7 @@ namespace GyroMouseServer
         // TCP variables --
         private IPAddress serverIPAddr = IPAddress.Parse(LocalHost.getLocalHost());
         private TcpListener tcpServer = null;
-        private Int32 tcpPort= Int32.Parse(GyroMouseServer.Properties.Settings.Default.preferredTCPPort);
+        private Int32 tcpPort;
 
 
         // Thread variables
@@ -147,6 +147,7 @@ namespace GyroMouseServer
             clientRequestHandleThread.Start();
 
             // start the tcpConnectionHandler Thread
+            tcpPort = Int32.Parse(GyroMouseServer.Properties.Settings.Default.preferredTCPPort);
             tCPConnectionHandler = new TCPConnectionHandler(serverIPAddr, tcpServer, tcpPort);
             ThreadStart ts = new ThreadStart(tCPConnectionHandler.Run);
             TCPConnectionHandlerThread = new Thread(ts);
@@ -186,8 +187,7 @@ namespace GyroMouseServer
                 if (tCPConnectionHandler!=null && TCPConnectionHandlerThread.IsAlive)
                 {
                     tCPConnectionHandler.Kill();
-                    //TCPConnectionHandlerThread.Abort();
-                    
+                    TCPConnectionHandlerThread.Abort();
                 }
 
                
@@ -262,6 +262,7 @@ namespace GyroMouseServer
         public void restartServer()
         {
             button_stopServer_Click(null, null);
+            Thread.Sleep(200);
             button_startServer_Click(null, null);
         }
         

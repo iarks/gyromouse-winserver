@@ -60,7 +60,7 @@ namespace GyroMouseServer
 
                     Console.WriteLine("Received from new client - printing outside while: {0}", receivedString);
 
-                    if (receivedString == "CANCONNECT?")
+                    if (receivedString == "CANCONNECT?" + GyroMouseServer.Properties.Settings.Default.preferredUDPPort)
                     {
                         receivedString = "";
                         connectThisClientFlag = 0;
@@ -125,6 +125,8 @@ namespace GyroMouseServer
                     else
                     {
                         Console.WriteLine("WE DONT LIKE WHAT THIS GUY SAID. FUCK HIM!");
+                        byte[] msgn = System.Text.Encoding.ASCII.GetBytes("BUSY");
+                        stream.Write(msgn, 0, msgn.Length);
                         client.Close();
                     }
                 }

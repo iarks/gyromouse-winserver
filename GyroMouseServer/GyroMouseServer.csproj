@@ -88,7 +88,6 @@
     </Compile>
     <Compile Include="ServerState.cs" />
     <Compile Include="SessionKeyGenerator.cs" />
-    <Compile Include="TCPClientListener.cs" />
     <Compile Include="TCPConnectionHandler.cs" />
     <Compile Include="Toast.cs" />
     <Compile Include="WinkeyInput.cs" />
