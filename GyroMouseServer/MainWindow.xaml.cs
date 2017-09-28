@@ -269,24 +269,30 @@ namespace GyroMouseServer
 
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
+            Console.WriteLine("closing application");
+            Console.WriteLine("disposing tray icon");
             // dispose tray icon
             if (this.notify != null)
             {
                 this.notify.Dispose();
             }
+            Console.WriteLine("tray icon disposed");
 
             //shutdown server
             button_stopServer_Click(null, null);
 
             // Shutdown the application.
+            Console.WriteLine("shut down application");
             System.Windows.Application.Current.Shutdown();
         }
 
         public void restartServer()
         {
+            Console.WriteLine("restaring server");
             button_stopServer_Click(null, null);
             Thread.Sleep(200);
             button_startServer_Click(null, null);
+            Console.WriteLine("server restarted");
         }
         
     }
