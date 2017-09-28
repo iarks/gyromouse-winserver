@@ -25,17 +25,23 @@ namespace GyroMouseServer
         private Int32 tcpPort;
 
 
-        // Thread variables
+        // the context of the UI thread
         private SynchronizationContext UIThread;
-        private ThreadStart clientRequestHandleThreadStart;
-        private Thread clientRequestHandleThread;
-        private Thread TCPConnectionHandlerThread;
-        private TCPConnectionHandler tCPConnectionHandler;
 
-        private ThreadStart waitingOnClientThreadStart;
-        private Thread waitingOnClientThread;
+        // Thread variables
+        // this thread handles client requests
+        private ClientRequestParser clientRequestParser;
+        private ThreadStart clientRequestParserThreadStart;
+        private Thread clientRequestHandleThread;
+
+        // this thread handles incoming tcp connections
+        private TCPConnectionHandler tCPConnectionHandler;
+        private ThreadStart ts;
+        private Thread TCPConnectionHandlerThread;
+
+
         private Barrier sync;
-        private ClientRequestParser clientRequestHandler;
+
 
         // Notification managers
         private NotifyIcon notify;
@@ -44,9 +50,13 @@ namespace GyroMouseServer
         // Other variables
         private BlockingCollection<string> blockingCollections;
 
+        // setting up the main window
         public MainWindow()
         {
+            Console.WriteLine("Initialising components");
             InitializeComponent();
+            Console.WriteLine("Initialising components completed");
+
 
             // initialize sync context
             UIThread = SynchronizationContext.Current;
@@ -56,7 +66,9 @@ namespace GyroMouseServer
                 this.WindowState = WindowState.Minimized;
 
             // setup system tray
+            Console.WriteLine("setting up system tray");
             sysTraySetup();
+            Console.WriteLine("setting up system complete");
 
             // autostart server if necessary
             if (GyroMouseServer.Properties.Settings.Default.autoServe)
@@ -83,6 +95,7 @@ namespace GyroMouseServer
             //toast.Failed += ToastFailed;
 
             ServerState.applicationRunning = true;
+            Console.WriteLine("initialising system variables complete");
         }
 
         //private void ToastFailed(ToastNotification sender, ToastFailedEventArgs args)
@@ -100,7 +113,7 @@ namespace GyroMouseServer
         //    //throw new NotImplementedException();
         //}
 
-        void sysTraySetup()
+        private void sysTraySetup()
         {
             this.notify = new NotifyIcon
             {
@@ -119,39 +132,45 @@ namespace GyroMouseServer
 
         private void button_startServer_Click(object sender, RoutedEventArgs e)
         {
-            // initialise serverside endpoint
+            Console.WriteLine("server starting");
+            
+            // initialise serverside endpoint - the address of this machine
             serverEndPoint = new IPEndPoint(IPAddress.Any, Int32.Parse(GyroMouseServer.Properties.Settings.Default.preferredUDPPort));
 
-            // start listening
+            // start listening for incoming commands at this port
             listeningPort = new UdpClient(serverEndPoint);
-
 
             // update UI elements
             textBlock_ip.Text = LocalHost.getLocalHost();
             textBlock_port.Text = serverEndPoint.ToString().Substring(serverEndPoint.ToString().LastIndexOf(':') + 1);
             textBlock_notifications.Text = "Waiting for a client...";
 
-            // setup client endpoint to accept any incoming address
+            // setup client endpoint to accept any incoming address this is the address of the phone
             clientEndpoint = new IPEndPoint(IPAddress.Any, 0);
 
             // initialise a barrier
             sync = new Barrier(2);
-            
+
 
             // start the thread which handles client requests. The request parser thread waits till a client is available
-            clientRequestHandler = new ClientRequestParser(blockingCollections, serverEndPoint, clientEndpoint, listeningPort, UIThread, ref sync);
-            clientRequestHandler.SetUIElements(textBlock_notifications, textBlock_ip);
-            clientRequestHandleThreadStart = new ThreadStart(clientRequestHandler.ParseRequests);
-            clientRequestHandleThread = new Thread(clientRequestHandleThreadStart);
+            Console.WriteLine("starting thread which listends on the udp port");
+            clientRequestParser = new ClientRequestParser(blockingCollections, serverEndPoint, clientEndpoint, listeningPort, UIThread, ref sync);
+            clientRequestParser.SetUIElements(textBlock_notifications, textBlock_ip);
+            clientRequestParserThreadStart = new ThreadStart(clientRequestParser.ParseRequests);
+            clientRequestHandleThread = new Thread(clientRequestParserThreadStart);
             clientRequestHandleThread.Name = "clientRequestHandleThread";
             clientRequestHandleThread.Start();
+            Console.WriteLine("starting thread which listends on the udp port complete");
 
-            // start the tcpConnectionHandler Thread
+            // start the tcpConnectionHandler Thread. This thread is responsible for connecting new clients
+            Console.WriteLine("starting thread which listends for incoming connections");
             tcpPort = Int32.Parse(GyroMouseServer.Properties.Settings.Default.preferredTCPPort);
             tCPConnectionHandler = new TCPConnectionHandler(serverIPAddr, tcpServer, tcpPort);
-            ThreadStart ts = new ThreadStart(tCPConnectionHandler.Run);
+            ts = new ThreadStart(tCPConnectionHandler.Run);
             TCPConnectionHandlerThread = new Thread(ts);
+            TCPConnectionHandlerThread.Name = "TCPConnectionHandlerThread";
             TCPConnectionHandlerThread.Start();
+            Console.WriteLine("starting thread which listends for incoming connections complete");
 
             // toggle UI elements
             button_startServer.IsEnabled = false;
@@ -161,39 +180,38 @@ namespace GyroMouseServer
             Toast.generateToastInfo(5000, "Server Started", LocalHost.getLocalHost() + " : " + serverEndPoint.ToString().Substring(serverEndPoint.ToString().LastIndexOf(':') + 1));
 
             ServerState.serverRunning = true;
+            Console.WriteLine("Server started");
         }
-
 
         private void button_stopServer_Click(object sender, RoutedEventArgs e)
         {
+            Console.WriteLine("stopping server");
             try
             {
-
-                //close the ports
+                // close the udp port
+                Console.WriteLine("closing UDP Port");
                 if (listeningPort != null)
                 {
                     listeningPort.Close();
                 }
-                else if (listeningPort == null)
-                {
+                Console.WriteLine("closing UDP Port complete");
 
-                }
-
+                // kill the thread which receives the commands
+                Console.WriteLine("aborting client request handler");
                 if (clientRequestHandleThread != null && clientRequestHandleThread.IsAlive)
                 {
                     clientRequestHandleThread.Abort("Application shutting down");
                 }
+                Console.WriteLine("aborting client request handler");
 
+                Console.WriteLine("aborting tcp handler");
+                // kill the thread which connects the clients
                 if (tCPConnectionHandler!=null && TCPConnectionHandlerThread.IsAlive)
                 {
                     tCPConnectionHandler.Kill();
                     TCPConnectionHandlerThread.Abort();
                 }
-
-               
-
-
-
+                Console.WriteLine("aborting tcp handler complete");
 
                 //update UI elements
                 textBlock_notifications.Text = "Server Stopped";
@@ -204,24 +222,29 @@ namespace GyroMouseServer
                 button_startServer.IsEnabled = true;
                 button_stopServer.IsEnabled = false;
 
+                // reset the client object
                 Client.reset();
 
+                // update server status
                 ServerState.serverRunning = false;
+
+                Console.WriteLine("Server stopped");
             }
-            catch(Exception ex)
+            catch(Exception exception)
             {
-                Console.WriteLine(ex.StackTrace);
+                Console.WriteLine("exception occured");
+                Console.WriteLine(exception.StackTrace);
             }
         }
 
         private void button_settings_Click(object sender, RoutedEventArgs e)
         {
             // open settings window
+            Console.WriteLine("opening preferences dialog");
             PreferencesWindow prefWin = new PreferencesWindow();
             prefWin.Owner = this;
             prefWin.ShowDialog();
-
-
+            Console.WriteLine("opening preferences dialog");
         }
 
         private void button_about_Click(object sender, RoutedEventArgs e)
@@ -231,12 +254,12 @@ namespace GyroMouseServer
             //this.WindowState = System.Windows.WindowState.Minimized;
             //Toast.generateToastInfo(3000, "Hi", "This is a BallonTip from Windows Notification");
 
-            ToastNotificationManager.CreateToastNotifier("GyroMouseServer").Show(toast);
+            //ToastNotificationManager.CreateToastNotifier("GyroMouseServer").Show(toast);
         }
 
         private void Window_StateChanged(object sender, EventArgs e)
         {
-            // minimise to tray
+            // if minimise to tray is enabled, minimise to tray
             if (this.WindowState.Equals(System.Windows.WindowState.Minimized) && GyroMouseServer.Properties.Settings.Default.minTray)
             {
                 this.ShowInTaskbar = false;
