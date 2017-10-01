@@ -50,7 +50,8 @@ namespace GyroMouseServer
                     int i;
 
                     // Loop to receive all the data sent by the client.
-                    
+                    try
+                    {
                         while ((i = stream.Read(receivedBytes, 0, receivedBytes.Length)) != 0)
                         {
                             // Translate data bytes to a ASCII string.
@@ -58,11 +59,18 @@ namespace GyroMouseServer
                             Console.WriteLine("Received from new client: {0}", receivedString);
                             break;
                         }
-                    
+                    }
+                    catch(IOException e)
+                    {
+                        Console.WriteLine("Client did not response within given timeout");
+                        client.Close();
+                        goto Loopback;
+                    }
 
                     Console.WriteLine("Received from new client - printing outside while: {0}", receivedString);
+                    Console.WriteLine("Expected from client - printing outside while: {0}", "CANCONNECT?" + GyroMouseServer.Properties.Settings.Default.preferredUDPPort);
 
-                    if (receivedString == "CANCONNECT?" + GyroMouseServer.Properties.Settings.Default.preferredUDPPort)
+                    if (receivedString.Trim() == "CANCONNECT?" + GyroMouseServer.Properties.Settings.Default.preferredUDPPort)
                     {
                         receivedString = "";
                         connectThisClientFlag = 0;
@@ -80,7 +88,7 @@ namespace GyroMouseServer
                             {
                                 Console.WriteLine("ASKING UDERE?");
                                 NetworkStream str = Client.tcpClient.GetStream();
-                                str.ReadTimeout = 2000;
+                                str.ReadTimeout = 3000;
                                 str.Write(msg, 0, msg.Length);
                                 str.Flush();
 
@@ -132,6 +140,8 @@ namespace GyroMouseServer
                         stream.Write(msgn, 0, msgn.Length);
                         client.Close();
                     }
+                    Loopback:
+                    Console.WriteLine("Looping Back");
                 }
             }
             catch (Exception e)

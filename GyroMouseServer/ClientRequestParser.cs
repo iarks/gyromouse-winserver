@@ -35,43 +35,42 @@ namespace GyroMouseServer_ClientRequestHandler
 
         public ClientRequestParser(BlockingCollection<string> requestQueue, IPEndPoint serverEndPoint, IPEndPoint clientEndPoint, UdpClient newSocket, SynchronizationContext uiThread, ref Barrier sync)
         {
+            Console.WriteLine("initialising client request parser");
             this.serverEndPoint = serverEndPoint;
             this.clientEndPoint = clientEndPoint;
             this.newSocket = newSocket;
             this.uiThread = uiThread;
             this.requestQueue = requestQueue;
             this.sync = sync;
+            Console.WriteLine("initialising client request parser complete");
         }
 
         public void SetUIElements(TextBlock label_messages, TextBlock label_ipAddress)
         {
+            Console.WriteLine("setting up ui elements");
             this.label_messages = label_messages;
             this.label_ipAddress = label_ipAddress;
+            Console.WriteLine("setting up ui elements complete");
         }
 
         public void ParseRequests()
         {
-            
-            header = null;
-            param = null;
-
+            Console.WriteLine("staring to parse requests");
             while (true)
             {
-                Console.WriteLine("I'm in while!!");
+                Console.WriteLine("inside infinite while loop that listens on udp port");
 
-                
-                
-
-                
                 try
                 {
-                    // received byte
+                    // received byte on socket
                     receivedByte = newSocket.Receive(ref this.clientEndPoint);
 
                     // convert byte to string
                     receivedCommand = Encoding.UTF8.GetString(receivedByte, 0, receivedByte.Length);
-                }catch(Exception e)
+                }
+                catch (Exception e)
                 {
+                    Console.WriteLine("exception occurred");
                     Console.WriteLine(e.StackTrace);
                 }
                 Console.WriteLine(receivedCommand);
@@ -84,7 +83,6 @@ namespace GyroMouseServer_ClientRequestHandler
                 //    label_ipAddress.Text = Y.ToString() + ":" + X.ToString();
                 //}, null);
 
-                //if ((extractedCommand[2] == Client.ssKey || extractedCommand[3]==Client.ssKey) || extractedCommand[0] == "CANHAVEIP?" && extractedCommand[2]=="GMO")
                 if ((extractedCommand.Length == 3 && extractedCommand[2] == Client.ssKey) || (extractedCommand[0] == "CANHAVEIP?" && extractedCommand[2] == "GMO") || (extractedCommand.Length == 4 && extractedCommand[3]==Client.ssKey))
                 {
                     try
