@@ -45,6 +45,7 @@ namespace GyroMouseServer_ClientRequestHandler
             Console.WriteLine("initialising client request parser complete");
         }
 
+
         public void SetUIElements(TextBlock label_messages, TextBlock label_ipAddress)
         {
             Console.WriteLine("setting up ui elements");
@@ -53,9 +54,17 @@ namespace GyroMouseServer_ClientRequestHandler
             Console.WriteLine("setting up ui elements complete");
         }
 
+        string sessionKey;
+
         public void ParseRequests()
         {
             Console.WriteLine("staring to parse requests");
+
+            if (Client.getInstance() != null)
+                sessionKey = Client.getInstance().getKey();
+            else
+                sessionKey = "";
+
             while (true)
             {
                 Console.WriteLine("inside infinite while loop that listens on udp port");
@@ -64,7 +73,6 @@ namespace GyroMouseServer_ClientRequestHandler
                 {
                     // received byte on socket
                     receivedByte = newSocket.Receive(ref this.clientEndPoint);
-
                     // convert byte to string
                     receivedCommand = Encoding.UTF8.GetString(receivedByte, 0, receivedByte.Length);
                 }
@@ -83,7 +91,7 @@ namespace GyroMouseServer_ClientRequestHandler
                 //    label_ipAddress.Text = Y.ToString() + ":" + X.ToString();
                 //}, null);
 
-                if ((extractedCommand.Length == 3 && extractedCommand[2] == Client.ssKey) || (extractedCommand[0] == "CANHAVEIP?" && extractedCommand[2] == "GMO") || (extractedCommand.Length == 4 && extractedCommand[3]==Client.ssKey))
+                if ((extractedCommand.Length == 3 && extractedCommand[2] == Client.ssKeyGlobal) || (extractedCommand[0] == "CANHAVEIP?" && extractedCommand[2] == "GMO") || (extractedCommand.Length == 4 && extractedCommand[3]== Client.ssKeyGlobal))
                 {
                     try
                     {

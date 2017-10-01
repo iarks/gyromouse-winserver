@@ -44,7 +44,6 @@ namespace GyroMouseServer
                     client = tcpServer.AcceptTcpClient();
 
                     Console.WriteLine("Connected!");
-
                     NetworkStream stream = client.GetStream();
                     stream.ReadTimeout = 3000;
                     int i;
@@ -63,10 +62,12 @@ namespace GyroMouseServer
                     catch(IOException e)
                     {
                         Console.WriteLine("Client did not response within given timeout");
+                        // reject this client and go back to listening for new connections
                         client.Close();
                         goto Loopback;
                     }
 
+                    // otherwise
                     Console.WriteLine("Received from new client - printing outside while: {0}", receivedString);
                     Console.WriteLine("Expected from client - printing outside while: {0}", "CANCONNECT?" + GyroMouseServer.Properties.Settings.Default.preferredUDPPort);
 
@@ -76,45 +77,48 @@ namespace GyroMouseServer
                         connectThisClientFlag = 0;
                         // check if a previous client is available
                         Console.WriteLine("CANCONNECT? WAS RECEIVED - NEW CLIENT WANTS TO ESTABLISH CONNECTION AND IS REQUESTING A SESSIONKEY");
-                        if (Client.isConnected)
+                        if (Client.getInstance()!=null)
                         {
-                            Console.WriteLine("BUT A PREVIOUS CLIENT WAS ALREADY AVAILABLE - SO LETS SEE IF THEY CAN STILL CONNECT");
+                            Console.WriteLine("BUT A PREVIOUS CLIENT WAS ALREADY AVAILABLE - SO LETS SEE IF THEY ARE STILL AVAILABLE");
                             // means there was a previous client
                             // check if the client is still connected
-
-                            byte[] msg = System.Text.Encoding.ASCII.GetBytes("UDERE?");
+                            Client previousClientInstance = Client.getInstance();
 
                             try
                             {
                                 Console.WriteLine("ASKING UDERE?");
-                                NetworkStream str = Client.tcpClient.GetStream();
-                                str.ReadTimeout = 3000;
-                                str.Write(msg, 0, msg.Length);
-                                str.Flush();
+                                previousClientInstance.sendMessage("UDERE?");
 
-                                while ((i = Client.tcpStream.Read(receivedBytes, 0, receivedBytes.Length)) != 0)
+                                //get stream of previous client
+                                NetworkStream str = previousClientInstance.getSessionTcpClient().GetStream();
+                                str.ReadTimeout = 3000;
+
+                                while ((i = str.Read(receivedBytes, 0, receivedBytes.Length)) != 0)
                                 {
                                     // Translate data bytes to a ASCII string.
                                     receivedString = System.Text.Encoding.ASCII.GetString(receivedBytes, 0, i);
                                     Console.WriteLine("Received from new client: {0}", receivedString);
                                     break;
                                 }
+
                                 Console.WriteLine("break from while");
                                 Console.WriteLine("WHAT WAS RECEIVED?" + receivedString);
                                 if (receivedString != "YES")
                                 {
                                     Console.WriteLine("PREVIOUS CLIENT IS UNAVAILABLE");
+                                    previousClientInstance.closeConnection();
                                     ConnectThisClient(client, stream);
                                     connectThisClientFlag = 1;
                                 }
                             }
                             catch (Exception e)
                             {
+                                Console.WriteLine(e.StackTrace);
                                 // means old stream is redundant and no client is available
                                 Console.WriteLine("EXCEPTION THROWN - THEY ARE PROBABLY NOT AVAILABLE - OR TIMED OUT - SO GIVE THIS SLOT TO THE NEW CLIENT");
                                 connectThisClientFlag = 1;
+                                previousClientInstance.closeConnection();
                                 ConnectThisClient(client, stream);
-                                Console.WriteLine(e.StackTrace);
                             }
 
                             if (connectThisClientFlag == 0)
@@ -122,6 +126,7 @@ namespace GyroMouseServer
                                 Console.WriteLine("NO EXCEPTION THROWN - THEY ARE PROBABLY AVAILABLE - REJECT THIS CLIENT");
                                 byte[] msgn = System.Text.Encoding.ASCII.GetBytes("BUSY");
                                 stream.Write(msgn, 0, msgn.Length);
+                                previousClientInstance.closeConnection();
                                 client.Close();
                             }
 
@@ -161,22 +166,18 @@ namespace GyroMouseServer
             Console.WriteLine("Sent: {0}", sessionKey);
 
             //update client details
-            Console.WriteLine("UPDATED CLIENT OBJECT");
-            Client.isConnected = true;
-            Client.tcpClient = currentClient;
-            Client.tcpStream = currentClientStream;
-            Client.ssKey = sessionKey;
+            Console.WriteLine("UPDATE CLIENT OBJECT");
+            //delete old client instance
+            Client.reset();
+            Console.WriteLine("CLIENT OBJECT UPDATED");
+
+            //get a new client instance
+            Client newInstance = Client.getNewInstance();
+            newInstance.setProperties(true, currentClient, currentClientStream, sessionKey);
         }
 
         public void Kill()
         {
-            if (Client.tcpClient != null)
-            {
-                Client.tcpClient.Close();
-                Client.isConnected = false;
-                Client.ssKey = null;
-                Client.tcpStream = null;
-            }
             if (client != null)
                 client.Close();
             tcpServer.Stop();

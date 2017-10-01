@@ -188,6 +188,15 @@ namespace GyroMouseServer
             Console.WriteLine("stopping server");
             try
             {
+                // reset the client object
+                Client clientInstance = Client.getInstance();
+                if (clientInstance != null)
+                {
+                    clientInstance.sendMessage("SHUTTINGDOWN");
+                    clientInstance.closeConnection();
+                }
+
+
                 // close the udp port
                 Console.WriteLine("closing UDP Port");
                 if (listeningPort != null)
@@ -222,8 +231,7 @@ namespace GyroMouseServer
                 button_startServer.IsEnabled = true;
                 button_stopServer.IsEnabled = false;
 
-                // reset the client object
-                Client.reset();
+                
 
                 // update server status
                 ServerState.serverRunning = false;
